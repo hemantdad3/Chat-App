@@ -6,11 +6,12 @@ import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import OnlineStatusDot from './OnlineStatusDot';
-import { MessageSquare, ArrowLeft, Loader2, Users } from 'lucide-react';
+import GroupInfoModal from '../modals/GroupInfoModal';
+import { MessageSquare, ArrowLeft, Loader2, Users, Info } from 'lucide-react';
 
 /**
  * ChatWindow Component
- * Displays active conversation header with presence dot, message history, typing animation, and input
+ * Displays active conversation header with presence dot, message history, typing animation, group info, and input
  */
 const ChatWindow = ({ onBack }) => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ const ChatWindow = ({ onBack }) => {
   } = useChat();
 
   const [typingUsers, setTypingUsers] = useState([]);
+  const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom on new message or typing indicator update
@@ -69,9 +71,9 @@ const ChatWindow = ({ onBack }) => {
         <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-indigo-400 mb-4 shadow-xl">
           <MessageSquare className="w-8 h-8" />
         </div>
-        <h2 className="text-lg font-bold text-white mb-1">Your Direct Messages</h2>
+        <h2 className="text-lg font-bold text-white mb-1">Your Messages</h2>
         <p className="text-xs text-slate-400 max-w-sm">
-          Select a conversation from the sidebar or click "New Chat" to connect with registered users in real-time.
+          Select a conversation from the sidebar or click "New Chat" / "Group" to begin messaging in real-time.
         </p>
       </div>
     );
@@ -132,6 +134,17 @@ const ChatWindow = ({ onBack }) => {
             </div>
           </div>
         </div>
+
+        {/* Group Info / Settings button */}
+        {activeConversation.isGroup && (
+          <button
+            onClick={() => setIsGroupInfoOpen(true)}
+            className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+            title="Group Info & Members"
+          >
+            <Info className="w-5 h-5" />
+          </button>
+        )}
       </header>
 
       {/* Message Feed */}
@@ -171,6 +184,15 @@ const ChatWindow = ({ onBack }) => {
         onSendMessage={sendMessage}
         disabled={loadingMessages}
       />
+
+      {/* Group Info & Member Management Modal */}
+      {activeConversation.isGroup && (
+        <GroupInfoModal
+          isOpen={isGroupInfoOpen}
+          onClose={() => setIsGroupInfoOpen(false)}
+          conversation={activeConversation}
+        />
+      )}
     </div>
   );
 };

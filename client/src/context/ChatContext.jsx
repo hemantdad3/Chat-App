@@ -68,7 +68,6 @@ export const ChatProvider = ({ children }) => {
     try {
       const conv = await chatService.createDirectConversation(recipientId);
 
-      // Update conversations list if not already in list
       setConversations((prev) => {
         const exists = prev.some((c) => c._id === conv._id);
         if (exists) {
@@ -77,11 +76,44 @@ export const ChatProvider = ({ children }) => {
         return [conv, ...prev];
       });
 
-      // Select newly created/opened conversation
       await selectConversation(conv);
       return conv;
     } catch (err) {
       console.error('Failed to start chat:', err.message);
+      throw err;
+    }
+  };
+
+  // Create a multi-user group conversation
+  const createGroup = async (name, memberIds) => {
+    try {
+      const newGroup = await chatService.createGroup(name, memberIds);
+
+      setConversations((prev) => [newGroup, ...prev]);
+      await selectConversation(newGroup);
+      return newGroup;
+    } catch (err) {
+      console.error('Failed to create group:', err.message);
+      throw err;
+    }
+  };
+
+  // Update group details (rename, add/remove member)
+  const updateGroup = async (conversationId, updateData) => {
+    try {
+      const updated = await chatService.updateGroup(conversationId, updateData);
+
+      setConversations((prev) =>
+        prev.map((c) => (c._id === conversationId ? updated : c))
+      );
+
+      if (activeConversation?._id === conversationId) {
+        setActiveConversation(updated);
+      }
+
+      return updated;
+    } catch (err) {
+      console.error('Failed to update group:', err.message);
       throw err;
     }
   };
@@ -123,7 +155,6 @@ export const ChatProvider = ({ children }) => {
         { conversationId: activeConversation._id, content: content.trim() },
         (response) => {
           if (response?.status === 'ok' && response.message) {
-            // Reconcile optimistic message with server persisted message
             setMessages((prev) =>
               prev.map((m) => (m._id === tempId ? response.message : m))
             );
@@ -138,7 +169,7 @@ export const ChatProvider = ({ children }) => {
         }
       );
     } else {
-      // Fallback to REST endpoint if socket temporarily disconnected
+      // Fallback to REST endpoint
       try {
         const savedMessage = await chatService.sendMessage(
           activeConversation._id,
@@ -156,22 +187,20 @@ export const ChatProvider = ({ children }) => {
         );
       } catch (err) {
         console.error('Failed to send message via REST fallback:', err.message);
-        // Remove optimistic message on error
         setMessages((prev) => prev.filter((m) => m._id !== tempId));
       }
     }
   };
 
-  // Listen for real-time incoming messages via socket
+  // Socket event listeners
   useEffect(() => {
     if (!socket) return;
 
+    // Incoming messages
     const handleReceiveMessage = (newMessage) => {
-      // If message belongs to currently active conversation, append it
       setActiveConversation((currentActive) => {
         if (currentActive && currentActive._id === newMessage.conversationId) {
           setMessages((prev) => {
-            // Prevent duplicate message if already added optimistically
             const exists = prev.some(
               (m) =>
                 m._id === newMessage._id ||
@@ -188,7 +217,6 @@ export const ChatProvider = ({ children }) => {
         return currentActive;
       });
 
-      // Update lastMessage preview in conversations list
       setConversations((prev) => {
         const exists = prev.some((c) => c._id === newMessage.conversationId);
         if (exists) {
@@ -198,17 +226,31 @@ export const ChatProvider = ({ children }) => {
               : c
           );
         } else {
-          // If a new conversation was started by another user, refresh conversations list
           fetchConversations();
           return prev;
         }
       });
     };
 
+    // Real-time group updates (member added/removed, renamed)
+    const handleGroupUpdated = (updatedGroup) => {
+      setConversations((prev) =>
+        prev.map((c) => (c._id === updatedGroup._id ? updatedGroup : c))
+      );
+      setActiveConversation((currentActive) => {
+        if (currentActive && currentActive._id === updatedGroup._id) {
+          return updatedGroup;
+        }
+        return currentActive;
+      });
+    };
+
     socket.on('receive_message', handleReceiveMessage);
+    socket.on('group_updated', handleGroupUpdated);
 
     return () => {
       socket.off('receive_message', handleReceiveMessage);
+      socket.off('group_updated', handleGroupUpdated);
     };
   }, [socket, fetchConversations]);
 
@@ -222,6 +264,8 @@ export const ChatProvider = ({ children }) => {
         loadingMessages,
         selectConversation,
         startDirectChat,
+        createGroup,
+        updateGroup,
         sendMessage,
         fetchConversations,
       }}

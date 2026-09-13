@@ -3,11 +3,12 @@ import { useChat } from '../../context/ChatContext';
 import { useAuth } from '../../context/AuthContext';
 import ConversationListItem from '../chat/ConversationListItem';
 import NewChatModal from '../modals/NewChatModal';
+import NewGroupModal from '../modals/NewGroupModal';
 import { MessageSquarePlus, Users, LogOut, MessageSquare, Loader2 } from 'lucide-react';
 
 /**
  * Sidebar Component
- * Left pane displaying conversation list and action triggers
+ * Left pane displaying conversation list, "New Chat" and "New Group" actions
  */
 const Sidebar = () => {
   const { user, logout } = useAuth();
@@ -20,6 +21,7 @@ const Sidebar = () => {
   } = useChat();
 
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
+  const [isNewGroupOpen, setIsNewGroupOpen] = useState(false);
 
   return (
     <aside className="w-full md:w-80 lg:w-96 h-full flex flex-col bg-slate-950 border-r border-slate-800/80 shrink-0">
@@ -31,19 +33,29 @@ const Sidebar = () => {
           </div>
           <div>
             <h1 className="text-base font-bold text-white tracking-tight">Messages</h1>
-            <p className="text-[11px] text-slate-400">Direct Conversations</p>
+            <p className="text-[11px] text-slate-400">Direct & Groups</p>
           </div>
         </div>
 
-        {/* Action button */}
-        <button
-          onClick={() => setIsNewChatOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
-          title="Start New Chat"
-        >
-          <MessageSquarePlus className="w-4 h-4" />
-          <span>New Chat</span>
-        </button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setIsNewChatOpen(true)}
+            className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-indigo-400 hover:text-indigo-300 rounded-xl transition-all cursor-pointer"
+            title="Start Direct Chat"
+          >
+            <MessageSquarePlus className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={() => setIsNewGroupOpen(true)}
+            className="flex items-center gap-1 px-2.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+            title="Create New Group"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Group</span>
+          </button>
+        </div>
       </div>
 
       {/* Conversations List */}
@@ -60,14 +72,22 @@ const Sidebar = () => {
             </div>
             <h3 className="text-sm font-medium text-slate-300 mb-1">No conversations yet</h3>
             <p className="text-xs text-slate-500 mb-4">
-              Click "New Chat" above to search users and send your first message.
+              Start a direct chat or create a group to begin messaging.
             </p>
-            <button
-              onClick={() => setIsNewChatOpen(true)}
-              className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-indigo-400 font-medium transition-colors"
-            >
-              Find Contacts
-            </button>
+            <div className="flex justify-center gap-2">
+              <button
+                onClick={() => setIsNewChatOpen(true)}
+                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs text-indigo-400 font-medium transition-colors"
+              >
+                New Chat
+              </button>
+              <button
+                onClick={() => setIsNewGroupOpen(true)}
+                className="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 rounded-xl text-xs text-indigo-300 font-medium transition-colors"
+              >
+                New Group
+              </button>
+            </div>
           </div>
         ) : (
           conversations.map((conv) => (
@@ -103,11 +123,16 @@ const Sidebar = () => {
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Modals */}
       <NewChatModal
         isOpen={isNewChatOpen}
         onClose={() => setIsNewChatOpen(false)}
         onSelectUser={startDirectChat}
+      />
+
+      <NewGroupModal
+        isOpen={isNewGroupOpen}
+        onClose={() => setIsNewGroupOpen(false)}
       />
     </aside>
   );

@@ -2,6 +2,7 @@ const express = require('express');
 const {
   getConversations,
   createOrGetConversation,
+  updateGroup,
 } = require('../controllers/conversationController');
 const {
   getMessages,
@@ -17,6 +18,9 @@ router.use(protect);
 router.route('/')
   .get(getConversations)
   .post(createOrGetConversation);
+
+router.route('/:id')
+  .patch(updateGroup);
 
 router.route('/:id/messages')
   .get(getMessages)

@@ -2,7 +2,7 @@ import api from './api';
 
 const chatService = {
   /**
-   * Search users for direct messaging
+   * Search users for direct messaging or group selection
    * @param {string} search
    */
   getUsers: async (search = '') => {
@@ -29,6 +29,30 @@ const chatService = {
       recipientId,
       isGroup: false,
     });
+    return response.data;
+  },
+
+  /**
+   * Create a new multi-user group chat
+   * @param {string} name
+   * @param {string[]} memberIds
+   */
+  createGroup: async (name, memberIds) => {
+    const response = await api.post('/conversations', {
+      name,
+      memberIds,
+      isGroup: true,
+    });
+    return response.data;
+  },
+
+  /**
+   * Update group properties (rename, add/remove member) - Admin only
+   * @param {string} conversationId
+   * @param {{ name?: string, addMemberId?: string, removeMemberId?: string }} updateData
+   */
+  updateGroup: async (conversationId, updateData) => {
+    const response = await api.patch(`/conversations/${conversationId}`, updateData);
     return response.data;
   },
 
