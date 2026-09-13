@@ -149,7 +149,7 @@ const NewGroupModal = ({ isOpen, onClose }) => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search contacts to add..."
+            placeholder="Search contacts by username..."
             className="w-full bg-slate-950/80 border border-slate-800 text-slate-200 text-sm rounded-xl pl-10 pr-4 py-2.5 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
           />
         </div>
@@ -184,7 +184,6 @@ const NewGroupModal = ({ isOpen, onClose }) => {
                     </div>
                     <div>
                       <h4 className="text-xs font-medium text-slate-200">{u.name}</h4>
-                      <p className="text-[10px] text-slate-400">{u.email}</p>
                     </div>
                   </div>
 

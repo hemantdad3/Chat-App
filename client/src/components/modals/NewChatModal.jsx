@@ -76,7 +76,7 @@ const NewChatModal = ({ isOpen, onClose, onSelectUser }) => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or email..."
+            placeholder="Search by username..."
             autoFocus
             className="w-full bg-slate-950/80 border border-slate-800 text-slate-200 text-sm rounded-xl pl-10 pr-4 py-2.5 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
           />
@@ -93,7 +93,7 @@ const NewChatModal = ({ isOpen, onClose, onSelectUser }) => {
             <div className="flex flex-col items-center justify-center h-40 text-slate-500 gap-1 text-center">
               <User className="w-8 h-8 opacity-40 mb-1" />
               <span className="text-xs text-slate-400 font-medium">No users found</span>
-              <span className="text-[11px] text-slate-600">Try searching for a different name or email</span>
+              <span className="text-[11px] text-slate-600">Try searching for a different username</span>
             </div>
           ) : (
             users.map((u) => (
@@ -108,7 +108,6 @@ const NewChatModal = ({ isOpen, onClose, onSelectUser }) => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-slate-200">{u.name}</h4>
-                    <p className="text-xs text-slate-400">{u.email}</p>
                   </div>
                 </div>
 

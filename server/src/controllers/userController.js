@@ -15,10 +15,9 @@ const getUsers = async (req, res) => {
       _id: { $ne: currentUserId },
     };
 
-    // If search term provided, match against name or email
+    // If search term provided, match strictly against username/name
     if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), 'i');
-      query.$or = [{ name: searchRegex }, { email: searchRegex }];
+      query.name = new RegExp(search.trim(), 'i');
     }
 
     const users = await User.find(query)
