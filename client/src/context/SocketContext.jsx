@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
@@ -8,14 +8,16 @@ export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
   const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [onlineUserIds, setOnlineUserIds] = useState(new Set());
 
   useEffect(() => {
-    // Only establish socket connection when user is authenticated
+    // Only connect socket when user is logged in
     if (!user) {
       if (socket) {
         socket.disconnect();
         setSocket(null);
         setConnected(false);
+        setOnlineUserIds(new Set());
       }
       return;
     }
@@ -24,7 +26,7 @@ export const SocketProvider = ({ children }) => {
     const newSocket = io(socketUrl, {
       withCredentials: true,
       auth: {
-        token: user.token, // Bearer fallback
+        token: user.token,
       },
       transports: ['websocket', 'polling'],
     });
@@ -39,6 +41,24 @@ export const SocketProvider = ({ children }) => {
       setConnected(false);
     });
 
+    // Initial list of online users from server
+    newSocket.on('online_users', (userIds) => {
+      setOnlineUserIds(new Set(userIds.map((id) => id.toString())));
+    });
+
+    // Real-time presence change event
+    newSocket.on('user_status_change', ({ userId, isOnline }) => {
+      setOnlineUserIds((prev) => {
+        const next = new Set(prev);
+        if (isOnline) {
+          next.add(userId.toString());
+        } else {
+          next.delete(userId.toString());
+        }
+        return next;
+      });
+    });
+
     newSocket.on('connect_error', (err) => {
       console.error('Socket connect error:', err.message);
       setConnected(false);
@@ -51,13 +71,33 @@ export const SocketProvider = ({ children }) => {
     };
   }, [user]);
 
+  // Helper function to check if a user is online
+  const isUserOnline = useCallback(
+    (userId) => {
+      if (!userId) return false;
+      return onlineUserIds.has(userId.toString());
+    },
+    [onlineUserIds]
+  );
+
   return (
-    <SocketContext.Provider value={{ socket, connected }}>
+    <SocketContext.Provider
+      value={{
+        socket,
+        connected,
+        onlineUserIds,
+        isUserOnline,
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );
 };
 
 export const useSocket = () => {
-  return useContext(SocketContext);
+  const context = useContext(SocketContext);
+  if (!context) {
+    throw new Error('useSocket must be used within a SocketProvider');
+  }
+  return context;
 };

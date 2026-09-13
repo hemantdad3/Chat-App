@@ -1,16 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useChat } from '../../context/ChatContext';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
+import TypingIndicator from './TypingIndicator';
+import OnlineStatusDot from './OnlineStatusDot';
 import { MessageSquare, ArrowLeft, Loader2, Users } from 'lucide-react';
 
 /**
  * ChatWindow Component
- * Right pane displaying active conversation header, message feed, and input
+ * Displays active conversation header with presence dot, message history, typing animation, and input
  */
 const ChatWindow = ({ onBack }) => {
   const { user } = useAuth();
+  const { socket, isUserOnline } = useSocket();
   const {
     activeConversation,
     messages,
@@ -18,12 +22,45 @@ const ChatWindow = ({ onBack }) => {
     sendMessage,
   } = useChat();
 
+  const [typingUsers, setTypingUsers] = useState([]);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom on new message
+  // Auto-scroll to bottom on new message or typing indicator update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, typingUsers]);
+
+  // Listen for real-time typing events from socket
+  useEffect(() => {
+    if (!socket || !activeConversation) return;
+
+    setTypingUsers([]);
+
+    const handleTyping = ({ conversationId, user: typingUser }) => {
+      if (conversationId === activeConversation._id && typingUser._id !== user._id) {
+        setTypingUsers((prev) => {
+          const exists = prev.some((u) => u._id === typingUser._id);
+          if (exists) return prev;
+          return [...prev, typingUser];
+        });
+      }
+    };
+
+    const handleStopTyping = ({ conversationId, userId }) => {
+      if (conversationId === activeConversation._id) {
+        setTypingUsers((prev) => prev.filter((u) => u._id !== userId));
+      }
+    };
+
+    socket.on('typing', handleTyping);
+    socket.on('stop_typing', handleStopTyping);
+
+    return () => {
+      socket.off('typing', handleTyping);
+      socket.off('stop_typing', handleStopTyping);
+      setTypingUsers([]);
+    };
+  }, [socket, activeConversation, user]);
 
   // Empty state when no conversation selected
   if (!activeConversation) {
@@ -51,6 +88,10 @@ const ChatWindow = ({ onBack }) => {
     displayName = otherParticipant?.name || 'Direct Chat';
   }
 
+  const isOnline = !activeConversation.isGroup && otherParticipant
+    ? isUserOnline(otherParticipant._id)
+    : false;
+
   return (
     <div className="flex-1 h-full flex flex-col bg-slate-900/30 overflow-hidden">
       {/* Header */}
@@ -66,22 +107,28 @@ const ChatWindow = ({ onBack }) => {
           </button>
 
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center font-semibold text-sm text-indigo-300">
-            {activeConversation.isGroup ? (
-              <Users className="w-5 h-5 text-indigo-400" />
-            ) : (
-              displayName.charAt(0).toUpperCase()
-            )}
+          <div className="relative">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center font-semibold text-sm text-indigo-300">
+              {activeConversation.isGroup ? (
+                <Users className="w-5 h-5 text-indigo-400" />
+              ) : (
+                displayName.charAt(0).toUpperCase()
+              )}
+            </div>
           </div>
 
           <div>
-            <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">
-              {displayName}
-            </h2>
-            <div className="text-[11px] text-slate-400">
-              {activeConversation.isGroup
-                ? `${activeConversation.members?.length || 0} members`
-                : otherParticipant?.email || '1-on-1 conversation'}
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                {displayName}
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-slate-400">
+              {activeConversation.isGroup ? (
+                <span>{activeConversation.members?.length || 0} members</span>
+              ) : (
+                <OnlineStatusDot isOnline={isOnline} showText={true} />
+              )}
             </div>
           </div>
         </div>
@@ -115,8 +162,12 @@ const ChatWindow = ({ onBack }) => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Typing Indicator */}
+      <TypingIndicator typingUsers={typingUsers} />
+
       {/* Input */}
       <MessageInput
+        conversationId={activeConversation._id}
         onSendMessage={sendMessage}
         disabled={loadingMessages}
       />

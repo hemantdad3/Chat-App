@@ -1,5 +1,7 @@
 import React from 'react';
-import { Users, User as UserIcon } from 'lucide-react';
+import { Users } from 'lucide-react';
+import { useSocket } from '../../context/SocketContext';
+import OnlineStatusDot from './OnlineStatusDot';
 
 /**
  * Format timestamp for list item
@@ -22,9 +24,11 @@ const formatListTime = (dateStr) => {
 
 /**
  * ConversationListItem Component
- * Sidebar card representing a single conversation
+ * Sidebar card representing a single conversation with presence indicator
  */
 const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect }) => {
+  const { isUserOnline } = useSocket();
+
   // Determine display name and other participant for 1-on-1
   let displayName = conversation.name;
   let otherParticipant = null;
@@ -35,6 +39,10 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
     );
     displayName = otherParticipant?.name || 'Direct Chat';
   }
+
+  const isOnline = !conversation.isGroup && otherParticipant
+    ? isUserOnline(otherParticipant._id)
+    : false;
 
   const lastMsg = conversation.lastMessage;
   const lastMsgContent = lastMsg?.content || 'No messages yet';
@@ -49,7 +57,7 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
           : 'bg-slate-900/40 hover:bg-slate-900/80 border-transparent hover:border-slate-800'
       }`}
     >
-      {/* Avatar */}
+      {/* Avatar with Online indicator badge */}
       <div className="relative shrink-0">
         <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-sm font-semibold text-indigo-300">
           {conversation.isGroup ? (
@@ -58,12 +66,19 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
             displayName.charAt(0).toUpperCase()
           )}
         </div>
+
+        {/* Online status dot badge */}
+        {!conversation.isGroup && (
+          <div className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-slate-950 rounded-full">
+            <OnlineStatusDot isOnline={isOnline} />
+          </div>
+        )}
       </div>
 
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <h3 className="text-xs sm:text-sm font-medium text-slate-200 truncate">
+          <h3 className="text-xs sm:text-sm font-medium text-slate-200 truncate flex items-center gap-1.5">
             {displayName}
           </h3>
           {lastMsgTime && (
