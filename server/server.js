@@ -43,7 +43,13 @@ app.set('io', io);
 
 // Mount API Routes
 const authRoutes = require('./src/routes/authRoutes');
+const userRoutes = require('./src/routes/userRoutes');
+const conversationRoutes = require('./src/routes/conversationRoutes');
+const initSocket = require('./src/socket/socketHandler');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/conversations', conversationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -54,14 +60,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Basic socket connection test for Phase 1
-io.on('connection', (socket) => {
-  console.log(`Socket client connected: ${socket.id}`);
-
-  socket.on('disconnect', () => {
-    console.log(`Socket client disconnected: ${socket.id}`);
-  });
-});
+// Initialize Socket.io events and authentication
+initSocket(io);
 
 // 404 and Error handling middleware
 app.use(notFound);
