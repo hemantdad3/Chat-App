@@ -71,7 +71,7 @@ const ChatWindow = ({ onBack }) => {
         <div className="w-16 h-16 rounded-2xl bg-sand border border-sand-dark flex items-center justify-center text-terracotta mb-4">
           <MessageSquare className="w-8 h-8" />
         </div>
-        <h2 className="font-serif text-xl font-semibold text-ink mb-1">Your Messages</h2>
+        <h2 className="text-lg font-bold text-ink mb-1">Your Messages</h2>
         <p className="text-xs text-ink-muted max-w-sm">
           Select a conversation from the sidebar or click "New Chat" / "Group" to begin messaging in real-time.
         </p>
@@ -121,7 +121,7 @@ const ChatWindow = ({ onBack }) => {
 
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-serif text-sm sm:text-base font-semibold text-ink tracking-tight">
+              <h2 className="text-sm sm:text-base font-bold text-ink tracking-tight">
                 {displayName}
               </h2>
             </div>

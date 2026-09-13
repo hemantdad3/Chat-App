@@ -84,7 +84,7 @@ const NewGroupModal = ({ isOpen, onClose }) => {
       <div className="w-full max-w-md bg-sand-light border border-ink-border rounded-2xl p-6 shadow-xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-ink-border">
-          <div className="flex items-center gap-2 text-ink font-semibold text-base font-serif">
+          <div className="flex items-center gap-2 text-ink font-semibold text-base">
             <Users className="w-5 h-5 text-terracotta" />
             <span>Create New Group</span>
           </div>
@@ -172,11 +172,10 @@ const NewGroupModal = ({ isOpen, onClose }) => {
                 <div
                   key={u._id}
                   onClick={() => toggleUserSelection(u._id)}
-                  className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
-                    isSelected
+                  className={`p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${isSelected
                       ? 'bg-sand-dark border-terracotta text-ink'
                       : 'bg-sand hover:bg-sand-dark border-ink-border/50 text-ink'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-cream border border-ink-border text-terracotta flex items-center justify-center text-xs font-semibold">
@@ -188,11 +187,10 @@ const NewGroupModal = ({ isOpen, onClose }) => {
                   </div>
 
                   <div
-                    className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
-                      isSelected
+                    className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${isSelected
                         ? 'bg-sage border-sage text-white'
                         : 'border-ink-border bg-cream text-transparent'
-                    }`}
+                      }`}
                   >
                     <Check className="w-3.5 h-3.5" />
                   </div>
