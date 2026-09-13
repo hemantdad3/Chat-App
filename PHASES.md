@@ -8,7 +8,7 @@ This document outlines the step-by-step implementation plan for the **MERN Real-
 
 | Phase | Description | Backend Scope | Frontend Scope | Status |
 |---|---|---|---|---|
-| **Phase 1** | Setup & Scaffolding | Express, Mongoose, Socket.io, .env config, MongoDB test | Vite + React + Tailwind CSS scaffold, folder structure, Axios instance | ⏳ Pending |
+| **Phase 1** | Setup & Scaffolding | Express, Mongoose, Socket.io, .env config, MongoDB test | Vite + React + Tailwind CSS scaffold, folder structure, Axios instance | ✅ Completed |
 | **Phase 2** | Authentication | Signup, Login, Logout, JWT (httpOnly cookie), Auth middleware | Auth pages (/signup, /login), AuthForm, AuthContext, ProtectedRoute | ⏳ Pending |
 | **Phase 3** | Core 1-on-1 Messaging | User search, Conversation & Message models, REST endpoints, Socket send/receive | Sidebar conversations, ChatWindow, MessageBubble, MessageInput, NewChatModal | ⏳ Pending |
 | **Phase 4** | Presence & Typing | Socket connection/disconnect tracking, online status broadcast, typing events | OnlineStatusDot, TypingIndicator with debounce, real-time presence indicators | ⏳ Pending |
