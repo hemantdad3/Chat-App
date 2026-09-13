@@ -11,7 +11,7 @@ const ChatLayout = () => {
   const { activeConversation, selectConversation } = useChat();
 
   return (
-    <div className="h-screen h-[100dvh] w-screen overflow-hidden bg-slate-950 flex flex-col md:flex-row text-slate-100">
+    <div className="h-screen h-[100dvh] w-screen overflow-hidden bg-cream flex flex-col md:flex-row text-ink">
       {/* Sidebar: full width on mobile when no active conversation, fixed width on desktop */}
       <div
         className={`h-full w-full md:w-80 lg:w-96 shrink-0 transition-all duration-200 ${

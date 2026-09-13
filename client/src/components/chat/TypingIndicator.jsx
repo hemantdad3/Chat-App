@@ -16,15 +16,15 @@ const TypingIndicator = ({ typingUsers = [] }) => {
       : `${names} are typing`;
 
   return (
-    <div className="px-4 py-1.5 flex items-center gap-2 text-xs text-indigo-400 bg-indigo-950/40 border-t border-indigo-900/30 animate-fadeIn">
+    <div className="px-4 py-2 flex items-center gap-2 text-xs bg-sand/60 border-t border-sand-dark">
       {/* 3 bouncing dots */}
       <div className="flex items-center gap-1">
-        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-        <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></span>
+        <span className="w-1.5 h-1.5 bg-terracotta rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+        <span className="w-1.5 h-1.5 bg-terracotta rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+        <span className="w-1.5 h-1.5 bg-terracotta rounded-full animate-bounce"></span>
       </div>
 
-      <span className="text-[11px] font-medium text-slate-300 italic">{text}...</span>
+      <span className="text-[11px] font-medium text-ink-muted italic">{text}...</span>
     </div>
   );
 };

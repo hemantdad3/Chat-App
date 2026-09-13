@@ -25,13 +25,12 @@ const formatListTime = (dateStr) => {
 
 /**
  * ConversationListItem Component
- * Displays conversation card with presence dot, unread badge counter, and latest message preview
+ * Displays conversation card with sage presence dot, sage unread badge, and warm palette
  */
 const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect }) => {
   const { isUserOnline } = useSocket();
   const { unreadCounts } = useChat();
 
-  // Unread badge count
   const unreadCount = unreadCounts[conversation._id] || 0;
 
   // Determine display name and other participant for 1-on-1
@@ -58,17 +57,17 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
       onClick={() => onSelect(conversation)}
       className={`p-3 rounded-xl cursor-pointer transition-all flex items-center gap-3 border ${
         isActive
-          ? 'bg-indigo-950/60 border-indigo-500/40 shadow-sm'
+          ? 'bg-sand border-sand-dark shadow-xs'
           : unreadCount > 0
-          ? 'bg-slate-900/90 border-slate-700/80 hover:bg-slate-900'
-          : 'bg-slate-900/40 hover:bg-slate-900/80 border-transparent hover:border-slate-800'
+          ? 'bg-cream-dark border-sand-dark hover:bg-sand/60'
+          : 'bg-cream hover:bg-sand/50 border-transparent hover:border-sand-dark'
       }`}
     >
       {/* Avatar with Online indicator badge */}
       <div className="relative shrink-0">
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-sm font-semibold text-indigo-300">
+        <div className="w-11 h-11 rounded-xl bg-sand-dark/60 border border-sand-dark text-ink font-semibold flex items-center justify-center text-sm">
           {conversation.isGroup ? (
-            <Users className="w-5 h-5 text-indigo-400" />
+            <Users className="w-5 h-5 text-ink-muted" />
           ) : (
             displayName.charAt(0).toUpperCase()
           )}
@@ -76,7 +75,7 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
 
         {/* Online status dot badge */}
         {!conversation.isGroup && (
-          <div className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-slate-950 rounded-full">
+          <div className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-cream rounded-full">
             <OnlineStatusDot isOnline={isOnline} />
           </div>
         )}
@@ -87,7 +86,7 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
         <div className="flex items-center justify-between gap-1 mb-0.5">
           <h3
             className={`text-xs sm:text-sm truncate flex items-center gap-1.5 ${
-              unreadCount > 0 ? 'font-bold text-white' : 'font-medium text-slate-200'
+              unreadCount > 0 ? 'font-bold text-ink' : 'font-medium text-ink'
             }`}
           >
             {displayName}
@@ -95,7 +94,7 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
           {lastMsgTime && (
             <span
               className={`text-[10px] shrink-0 ${
-                unreadCount > 0 ? 'text-indigo-400 font-semibold' : 'text-slate-500'
+                unreadCount > 0 ? 'text-sage font-semibold' : 'text-ink-muted'
               }`}
             >
               {lastMsgTime}
@@ -106,15 +105,15 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
         <div className="flex items-center justify-between gap-2">
           <p
             className={`text-xs truncate ${
-              unreadCount > 0 ? 'text-slate-200 font-medium' : 'text-slate-400'
+              unreadCount > 0 ? 'text-ink font-medium' : 'text-ink-muted'
             }`}
           >
             {lastMsgContent}
           </p>
 
-          {/* Unread Counter Badge */}
+          {/* Unread Counter Badge (accent color sage #4A6C4A) */}
           {unreadCount > 0 && (
-            <span className="shrink-0 px-2 py-0.5 bg-indigo-600 text-white font-bold text-[10px] rounded-full shadow-sm shadow-indigo-600/40 animate-pulse">
+            <span className="shrink-0 px-2 py-0.5 bg-sage text-white font-bold text-[10px] rounded-full">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}

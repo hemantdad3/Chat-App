@@ -4,7 +4,7 @@ import { useSocket } from '../../context/SocketContext';
 
 /**
  * MessageInput Component
- * Text input with send button and debounced typing indicator emission
+ * Text input with terracotta send button and debounced typing indicator
  * 
  * @param {{ conversationId: string, onSendMessage: (content: string) => void, disabled?: boolean }} props
  */
@@ -56,7 +56,7 @@ const MessageInput = ({ conversationId, onSendMessage, disabled }) => {
     e.preventDefault();
     if (!content.trim() || disabled) return;
 
-    // Immediately cancel typing indicator upon message dispatch
+    // Cancel typing indicator upon send
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
@@ -79,7 +79,7 @@ const MessageInput = ({ conversationId, onSendMessage, disabled }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-3 sm:p-4 border-t border-slate-800 bg-slate-900/90 backdrop-blur-md flex items-center gap-2.5"
+      className="p-3 sm:p-4 border-t border-sand-dark bg-cream-dark flex items-center gap-2.5"
     >
       <input
         type="text"
@@ -88,13 +88,13 @@ const MessageInput = ({ conversationId, onSendMessage, disabled }) => {
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
         disabled={disabled}
-        className="flex-1 bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+        className="flex-1 bg-cream border border-sand-dark text-ink placeholder-ink-faint text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-terracotta transition-colors disabled:opacity-50"
       />
 
       <button
         type="submit"
         disabled={!content.trim() || disabled}
-        className="p-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-xl transition-all shadow-md shadow-indigo-600/20 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center shrink-0"
+        className="p-3 bg-terracotta hover:bg-terracotta-hover disabled:bg-sand-dark disabled:text-ink-muted text-white rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed flex items-center justify-center shrink-0"
         title="Send Message"
       >
         <Send className="w-4 h-4" />

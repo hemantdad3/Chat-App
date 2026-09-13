@@ -13,9 +13,9 @@ const ProtectedRoute = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-        <p className="text-sm text-slate-400">Verifying session...</p>
+      <div className="min-h-screen bg-cream flex flex-col items-center justify-center text-ink">
+        <Loader2 className="w-8 h-8 animate-spin text-terracotta mb-3" />
+        <p className="text-sm text-ink-muted">Verifying session...</p>
       </div>
     );
   }

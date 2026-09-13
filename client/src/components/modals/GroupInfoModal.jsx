@@ -107,33 +107,33 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-xs animate-fadeIn">
+      <div className="w-full max-w-md bg-sand-light border border-ink-border rounded-2xl p-6 shadow-xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2 text-white font-semibold text-base">
-            <Users className="w-5 h-5 text-indigo-400" />
+        <div className="flex items-center justify-between pb-4 border-b border-ink-border">
+          <div className="flex items-center gap-2 text-ink font-semibold text-base">
+            <Users className="w-5 h-5 text-terracotta" />
             <span>Group Details</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1 text-ink-muted hover:text-ink rounded-lg hover:bg-sand transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs">
+          <div className="mt-3 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs">
             {error}
           </div>
         )}
 
         {/* Group Name & Rename section */}
-        <div className="my-4 p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl">
+        <div className="my-4 p-3 bg-sand border border-ink-border/70 rounded-xl">
           <div className="flex items-center justify-between">
             <div className="flex-1 mr-2">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 block mb-1">
+              <span className="text-[10px] uppercase font-semibold text-ink-muted block mb-1">
                 Group Name
               </span>
               {isEditingName ? (
@@ -142,26 +142,26 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                     type="text"
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-cream border border-ink-border text-ink text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-terracotta"
                     autoFocus
                   />
                   <button
                     onClick={handleRenameGroup}
                     disabled={loadingAction}
-                    className="p-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg"
+                    className="p-1.5 bg-terracotta hover:bg-terracotta-hover text-white rounded-lg cursor-pointer"
                   >
                     <Check className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ) : (
-                <h3 className="text-sm font-bold text-white truncate">{conversation.name}</h3>
+                <h3 className="text-sm font-bold text-ink truncate">{conversation.name}</h3>
               )}
             </div>
 
             {isAdmin && !isEditingName && (
               <button
                 onClick={() => setIsEditingName(true)}
-                className="p-1.5 text-slate-400 hover:text-indigo-400 rounded-lg hover:bg-slate-900"
+                className="p-1.5 text-ink-muted hover:text-terracotta rounded-lg hover:bg-sand-dark cursor-pointer"
                 title="Rename group"
               >
                 <Edit2 className="w-4 h-4" />
@@ -172,14 +172,14 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
 
         {/* Members Header */}
         <div className="flex items-center justify-between mt-2 mb-3">
-          <span className="text-xs font-semibold text-slate-300">
+          <span className="text-xs font-semibold text-ink">
             Members ({conversation.members?.length || 0})
           </span>
 
           {isAdmin && !isAddingMember && (
             <button
               onClick={() => setIsAddingMember(true)}
-              className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
+              className="flex items-center gap-1 text-xs text-terracotta hover:text-terracotta-hover font-medium cursor-pointer"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>Add Member</span>
@@ -189,9 +189,9 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
 
         {/* Search & Add Member Section (Searches ONLY by username, no email shown) */}
         {isAddingMember && (
-          <div className="mb-3 p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl space-y-2.5 animate-fadeIn">
+          <div className="mb-3 p-3 bg-sand border border-ink-border rounded-xl space-y-2.5 animate-fadeIn">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-indigo-200">
+              <span className="text-xs font-semibold text-ink">
                 Search & Add by Username
               </span>
               <button
@@ -199,7 +199,7 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                   setIsAddingMember(false);
                   setSearchQuery('');
                 }}
-                className="p-1 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-850"
+                className="p-1 text-ink-muted hover:text-ink rounded-lg hover:bg-sand-dark cursor-pointer"
                 title="Cancel"
               >
                 <X className="w-3.5 h-3.5" />
@@ -208,21 +208,21 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
 
             {/* Username Search Input */}
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-ink-faint absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Type username..."
                 autoFocus
-                className="w-full bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg pl-8.5 pr-3 py-2 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                className="w-full bg-cream border border-ink-border text-ink text-xs rounded-lg pl-8.5 pr-3 py-2 placeholder-ink-faint focus:outline-none focus:border-terracotta transition-colors"
               />
             </div>
 
             {/* Matching Users List (Only username shown, NO email/gmail id) */}
             <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1">
               {filteredUsers.length === 0 ? (
-                <div className="py-3 text-center text-xs text-slate-400">
+                <div className="py-3 text-center text-xs text-ink-muted">
                   {searchQuery.trim()
                     ? `No user found matching "${searchQuery}"`
                     : availableUsers.length === 0
@@ -233,14 +233,14 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                 filteredUsers.map((u) => (
                   <div
                     key={u._id}
-                    className="p-2 bg-slate-950/70 border border-slate-800 rounded-lg flex items-center justify-between hover:border-slate-700 transition-colors"
+                    className="p-2 bg-cream border border-ink-border/60 rounded-lg flex items-center justify-between hover:border-ink-border transition-colors"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xs font-semibold shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-sand-dark text-terracotta flex items-center justify-center text-xs font-semibold shrink-0">
                         {u.name?.charAt(0).toUpperCase()}
                       </div>
                       {/* Strictly show username only - no email/gmail id */}
-                      <span className="text-xs font-medium text-slate-200 truncate">
+                      <span className="text-xs font-medium text-ink truncate">
                         {u.name}
                       </span>
                     </div>
@@ -249,7 +249,7 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                       type="button"
                       onClick={() => handleAddMember(u._id)}
                       disabled={addingUserId === u._id}
-                      className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-md text-[11px] font-medium flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 bg-terracotta hover:bg-terracotta-hover disabled:opacity-50 text-white rounded-md text-[11px] font-medium flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
                     >
                       {addingUserId === u._id ? (
                         <Loader2 className="w-3 h-3 animate-spin" />
@@ -276,19 +276,19 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
             return (
               <div
                 key={m._id}
-                className="p-2.5 bg-slate-950/40 border border-slate-800/80 rounded-xl flex items-center justify-between"
+                className="p-2.5 bg-sand border border-ink-border/50 rounded-xl flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xs font-semibold">
+                  <div className="w-8 h-8 rounded-lg bg-cream border border-ink-border text-terracotta flex items-center justify-center text-xs font-semibold">
                     {m.name?.charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-slate-200">
-                        {m.name} {isMe && <span className="text-slate-500">(You)</span>}
+                      <span className="text-xs font-medium text-ink">
+                        {m.name} {isMe && <span className="text-ink-muted">(You)</span>}
                       </span>
                       {memberIsAdmin && (
-                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-sand-dark text-sage border border-ink-border font-medium">
                           <Shield className="w-2.5 h-2.5" />
                           Admin
                         </span>
@@ -302,7 +302,7 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                   <button
                     onClick={() => handleRemoveMember(m._id)}
                     disabled={loadingAction}
-                    className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                    className="p-1.5 text-ink-muted hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                     title="Remove member"
                   >
                     <UserMinus className="w-3.5 h-3.5" />
@@ -314,11 +314,11 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
         </div>
 
         {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-slate-800 text-right">
+        <div className="mt-4 pt-3 border-t border-ink-border text-right">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-1.5 bg-sand hover:bg-sand-dark text-ink text-xs font-medium rounded-xl border border-ink-border transition-colors cursor-pointer"
           >
             Close
           </button>
