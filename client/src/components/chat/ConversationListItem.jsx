@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
+import { useChat } from '../../context/ChatContext';
 import OnlineStatusDot from './OnlineStatusDot';
 
 /**
@@ -24,10 +25,14 @@ const formatListTime = (dateStr) => {
 
 /**
  * ConversationListItem Component
- * Sidebar card representing a single conversation with presence indicator
+ * Displays conversation card with presence dot, unread badge counter, and latest message preview
  */
 const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect }) => {
   const { isUserOnline } = useSocket();
+  const { unreadCounts } = useChat();
+
+  // Unread badge count
+  const unreadCount = unreadCounts[conversation._id] || 0;
 
   // Determine display name and other participant for 1-on-1
   let displayName = conversation.name;
@@ -54,6 +59,8 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
       className={`p-3 rounded-xl cursor-pointer transition-all flex items-center gap-3 border ${
         isActive
           ? 'bg-indigo-950/60 border-indigo-500/40 shadow-sm'
+          : unreadCount > 0
+          ? 'bg-slate-900/90 border-slate-700/80 hover:bg-slate-900'
           : 'bg-slate-900/40 hover:bg-slate-900/80 border-transparent hover:border-slate-800'
       }`}
     >
@@ -78,16 +85,40 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <h3 className="text-xs sm:text-sm font-medium text-slate-200 truncate flex items-center gap-1.5">
+          <h3
+            className={`text-xs sm:text-sm truncate flex items-center gap-1.5 ${
+              unreadCount > 0 ? 'font-bold text-white' : 'font-medium text-slate-200'
+            }`}
+          >
             {displayName}
           </h3>
           {lastMsgTime && (
-            <span className="text-[10px] text-slate-500 shrink-0">{lastMsgTime}</span>
+            <span
+              className={`text-[10px] shrink-0 ${
+                unreadCount > 0 ? 'text-indigo-400 font-semibold' : 'text-slate-500'
+              }`}
+            >
+              {lastMsgTime}
+            </span>
           )}
         </div>
-        <p className="text-xs text-slate-400 truncate">
-          {lastMsgContent}
-        </p>
+
+        <div className="flex items-center justify-between gap-2">
+          <p
+            className={`text-xs truncate ${
+              unreadCount > 0 ? 'text-slate-200 font-medium' : 'text-slate-400'
+            }`}
+          >
+            {lastMsgContent}
+          </p>
+
+          {/* Unread Counter Badge */}
+          {unreadCount > 0 && (
+            <span className="shrink-0 px-2 py-0.5 bg-indigo-600 text-white font-bold text-[10px] rounded-full shadow-sm shadow-indigo-600/40 animate-pulse">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

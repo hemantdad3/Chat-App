@@ -3,6 +3,7 @@ const cookie = require('cookie');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const { sanitizeInput } = require('../utils/sanitize');
 
 // In-memory tracking of active user connections: Map<userId, Set<socketId>>
 const onlineUsers = new Map();
@@ -123,6 +124,14 @@ const initSocket = (io) => {
           return;
         }
 
+        const cleanContent = sanitizeInput(content);
+        if (!cleanContent) {
+          if (typeof ack === 'function') {
+            return ack({ error: 'Message content cannot be empty' });
+          }
+          return;
+        }
+
         // Verify membership in conversation
         const conversation = await Conversation.findOne({
           _id: conversationId,
@@ -140,11 +149,12 @@ const initSocket = (io) => {
         const message = await Message.create({
           conversationId,
           sender: socket.user._id,
-          content: content.trim(),
+          content: cleanContent,
         });
 
-        // Update conversation lastMessage
+        // Update conversation lastMessage and bump updatedAt
         conversation.lastMessage = message._id;
+        conversation.updatedAt = new Date();
         await conversation.save();
 
         const populatedMessage = await Message.findById(message._id).populate(

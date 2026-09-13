@@ -12,8 +12,24 @@ export const ChatProvider = ({ children }) => {
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
   const [loadingConversations, setLoadingConversations] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
+
+  // Helper to reorder conversation to the top
+  const bumpConversationToTop = (convList, conversationId, lastMsg = null) => {
+    const index = convList.findIndex((c) => c._id === conversationId);
+    if (index === -1) return convList;
+
+    const targetConv = {
+      ...convList[index],
+      lastMessage: lastMsg || convList[index].lastMessage,
+      updatedAt: lastMsg?.createdAt || new Date().toISOString(),
+    };
+
+    const remaining = convList.filter((_, i) => i !== index);
+    return [targetConv, ...remaining];
+  };
 
   // Fetch all conversations for user
   const fetchConversations = useCallback(async () => {
@@ -21,7 +37,11 @@ export const ChatProvider = ({ children }) => {
     setLoadingConversations(true);
     try {
       const data = await chatService.getConversations();
-      setConversations(data);
+      // Ensure sorted by updatedAt descending
+      const sorted = [...data].sort(
+        (a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)
+      );
+      setConversations(sorted);
     } catch (err) {
       console.error('Failed to fetch conversations:', err.message);
     } finally {
@@ -34,7 +54,7 @@ export const ChatProvider = ({ children }) => {
     fetchConversations();
   }, [fetchConversations]);
 
-  // Select a conversation and load its messages
+  // Select a conversation, clear its unread count, and load messages
   const selectConversation = useCallback(
     async (conv) => {
       if (!conv) {
@@ -45,6 +65,12 @@ export const ChatProvider = ({ children }) => {
 
       setActiveConversation(conv);
       setLoadingMessages(true);
+
+      // Clear unread count for this conversation
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [conv._id]: 0,
+      }));
 
       // Join socket room
       if (socket && conv._id) {
@@ -71,7 +97,7 @@ export const ChatProvider = ({ children }) => {
       setConversations((prev) => {
         const exists = prev.some((c) => c._id === conv._id);
         if (exists) {
-          return prev.map((c) => (c._id === conv._id ? conv : c));
+          return bumpConversationToTop(prev, conv._id);
         }
         return [conv, ...prev];
       });
@@ -118,7 +144,7 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
-  // Send a message with optimistic update & socket emit
+  // Send a message with optimistic update, socket emit & dynamic sorting
   const sendMessage = async (content) => {
     if (!activeConversation || !content.trim()) return;
 
@@ -139,13 +165,9 @@ export const ChatProvider = ({ children }) => {
     // Optimistic UI update
     setMessages((prev) => [...prev, optimisticMessage]);
 
-    // Update conversation lastMessage in sidebar
+    // Bump active conversation to top of list
     setConversations((prev) =>
-      prev.map((c) =>
-        c._id === activeConversation._id
-          ? { ...c, lastMessage: optimisticMessage, updatedAt: new Date().toISOString() }
-          : c
-      )
+      bumpConversationToTop(prev, activeConversation._id, optimisticMessage)
     );
 
     // If socket is connected, emit send_message
@@ -199,6 +221,7 @@ export const ChatProvider = ({ children }) => {
     // Incoming messages
     const handleReceiveMessage = (newMessage) => {
       setActiveConversation((currentActive) => {
+        // If message is for the currently open conversation
         if (currentActive && currentActive._id === newMessage.conversationId) {
           setMessages((prev) => {
             const exists = prev.some(
@@ -213,18 +236,21 @@ export const ChatProvider = ({ children }) => {
             }
             return [...prev, newMessage];
           });
+        } else {
+          // If message is for a different conversation, increment unread count!
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [newMessage.conversationId]: (prev[newMessage.conversationId] || 0) + 1,
+          }));
         }
         return currentActive;
       });
 
+      // Dynamically bump the conversation to top of list
       setConversations((prev) => {
         const exists = prev.some((c) => c._id === newMessage.conversationId);
         if (exists) {
-          return prev.map((c) =>
-            c._id === newMessage.conversationId
-              ? { ...c, lastMessage: newMessage, updatedAt: newMessage.createdAt }
-              : c
-          );
+          return bumpConversationToTop(prev, newMessage.conversationId, newMessage);
         } else {
           fetchConversations();
           return prev;
@@ -232,7 +258,7 @@ export const ChatProvider = ({ children }) => {
       });
     };
 
-    // Real-time group updates (member added/removed, renamed)
+    // Real-time group updates
     const handleGroupUpdated = (updatedGroup) => {
       setConversations((prev) =>
         prev.map((c) => (c._id === updatedGroup._id ? updatedGroup : c))
@@ -260,6 +286,7 @@ export const ChatProvider = ({ children }) => {
         conversations,
         activeConversation,
         messages,
+        unreadCounts,
         loadingConversations,
         loadingMessages,
         selectConversation,

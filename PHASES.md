@@ -13,7 +13,7 @@ This document outlines the step-by-step implementation plan for the **MERN Real-
 | **Phase 3** | Core 1-on-1 Messaging | User search, Conversation & Message models, REST endpoints, Socket send/receive | Sidebar conversations, ChatWindow, MessageBubble, MessageInput, NewChatModal | ✅ Completed |
 | **Phase 4** | Presence & Typing | Socket connection/disconnect tracking, online status broadcast, typing events | OnlineStatusDot, TypingIndicator with debounce, real-time presence indicators | ✅ Completed |
 | **Phase 5** | Group Chat | Group creation, member add/remove, admin checks, group message broadcast | NewGroupModal, Group member list management UI, sender names on messages | ✅ Completed |
-| **Phase 6** | Polish & UX | Input sanitization, validation, recent conversation sorting, unread counters | Unread badge/counter, auto-scroll chat window, responsive layout (mobile) | ⏳ Pending |
+| **Phase 6** | Polish & UX | Input sanitization, validation, recent conversation sorting, unread counters | Unread badge/counter, auto-scroll chat window, responsive layout (mobile) | ✅ Completed |
 | **Phase 7** | Deployment | Render Web Service config, CORS credentials, production env configuration | Vercel frontend config, environment variables, end-to-end live testing | ⏳ Pending |
 
 ---

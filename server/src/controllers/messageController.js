@@ -1,5 +1,6 @@
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
+const { sanitizeInput } = require('../utils/sanitize');
 
 /**
  * @desc    Get message history for a conversation
@@ -47,6 +48,11 @@ const sendMessage = async (req, res) => {
       return res.status(400).json({ message: 'Message content cannot be empty' });
     }
 
+    const cleanContent = sanitizeInput(content);
+    if (!cleanContent) {
+      return res.status(400).json({ message: 'Message content cannot be empty' });
+    }
+
     // Verify user is a member
     const conversation = await Conversation.findOne({
       _id: conversationId,
@@ -61,11 +67,12 @@ const sendMessage = async (req, res) => {
     const message = await Message.create({
       conversationId,
       sender: currentUserId,
-      content: content.trim(),
+      content: cleanContent,
     });
 
     // Update conversation lastMessage reference and touch updatedAt
     conversation.lastMessage = message._id;
+    conversation.updatedAt = new Date();
     await conversation.save();
 
     const populatedMessage = await Message.findById(message._id).populate(
