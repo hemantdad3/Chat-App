@@ -77,7 +77,7 @@ const AuthForm = ({ mode }) => {
         <div className="p-3 bg-sand border border-ink-border rounded-2xl text-terracotta mb-4">
           <MessageSquare className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">
+        <h1 className="font-serif text-2xl font-semibold tracking-tight text-ink">
           {isSignup ? 'Create an Account' : 'Welcome Back'}
         </h1>
         <p className="text-sm text-ink-muted mt-1">

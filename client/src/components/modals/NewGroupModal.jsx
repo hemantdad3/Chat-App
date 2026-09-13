@@ -84,7 +84,7 @@ const NewGroupModal = ({ isOpen, onClose }) => {
       <div className="w-full max-w-md bg-sand-light border border-ink-border rounded-2xl p-6 shadow-xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-ink-border">
-          <div className="flex items-center gap-2 text-ink font-semibold text-base">
+          <div className="flex items-center gap-2 text-ink font-semibold text-base font-serif">
             <Users className="w-5 h-5 text-terracotta" />
             <span>Create New Group</span>
           </div>

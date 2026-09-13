@@ -6,6 +6,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Karla', 'sans-serif'],
+        serif: ['Fraunces', 'serif'],
+        display: ['Fraunces', 'serif'],
+      },
       colors: {
         cream: {
           DEFAULT: '#FAF6F0',

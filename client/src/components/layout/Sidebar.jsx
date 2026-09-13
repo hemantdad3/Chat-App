@@ -32,7 +32,7 @@ const Sidebar = () => {
             <MessageSquare className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-ink tracking-tight">Messages</h1>
+            <h1 className="font-serif text-lg font-semibold text-ink tracking-tight">Messages</h1>
             <p className="text-[11px] text-ink-muted">Direct & Groups</p>
           </div>
         </div>

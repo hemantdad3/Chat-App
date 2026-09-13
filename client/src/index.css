@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Karla:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
+  --font-sans: 'Karla', sans-serif;
+  --font-serif: 'Fraunces', serif;
+  --font-display: 'Fraunces', serif;
   --color-cream: #FAF6F0;
   --color-cream-dark: #F3ECE1;
   --color-terracotta: #C1502E;
@@ -24,7 +28,7 @@
   }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Karla', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #FAF6F0;
