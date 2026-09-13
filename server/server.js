@@ -41,6 +41,10 @@ const io = new Server(server, {
 // Pass io to routes if needed via req.io or socket handler
 app.set('io', io);
 
+// Mount API Routes
+const authRoutes = require('./src/routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
