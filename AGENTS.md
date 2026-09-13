@@ -26,7 +26,7 @@
   1. After every completed phase or verified major update, stage the changes.
   2. Create a clean, conventional commit message reflecting the delivered phase/feature:
      - Example: `feat: phase 2 - user authentication, jwt cookies, and route guards`
-  3. Push the commit to the remote GitHub repository:
+  3. Propose and ask the user for confirmation before pushing to the remote repository. Only push after explicit user approval:
      ```bash
      git push origin main
      ```
@@ -60,4 +60,4 @@ Development MUST progress through the 7 phases sequentially. Complete both backe
    - Use `async/await` exclusively (no raw callback chains or unhandled promises).
    - Write clean, human-readable code.
 7. **Ask Before Expanding**: If anything is ambiguous or seems missing from the PRD, ASK the user first instead of assuming.
-8. **Commit & Push**: Always propose and execute the Git commit and push to `origin main` at the conclusion of each phase.
+8. **Ask Before Push**: Always ask the user for explicit confirmation before pushing any commits to GitHub (`origin main`). Do not push code changes automatically without asking first.
