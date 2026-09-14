@@ -15,7 +15,7 @@
 
 ### Authentication & Account Security
 - **User Registration**: Sign up with full name, required unique username (`@username`, 3–30 characters), email, password, and optional JPG avatar.
-- **JWT Authentication**: Authenticated via JSON Web Tokens stored in secure `httpOnly` cookies (with Authorization header fallback).
+- **JWT Authentication**: Authenticated via JSON Web Tokens passed via the `Authorization: Bearer <token>` header (with `httpOnly` cookie support) for reliable cross-domain authentication between Vercel and Render.
 - **Password Security**: Passwords salted and hashed with `bcryptjs` before database persistence.
 - **Route Guards & Session Restore**: Client-side route protection (`ProtectedRoute`) and automatic session re-validation on page refresh via `GET /api/auth/me`.
 
@@ -58,7 +58,7 @@
 | **Database** | MongoDB + Mongoose | Document-oriented schema flexibility for message trees, conversation memberships, and populated references. |
 | **Cloud Storage** | ImageKit (Node.js SDK) | Reliable CDN image hosting that avoids file loss on ephemeral server containers. |
 | **File Handling** | Multer (`memoryStorage`) | Buffers uploaded avatar files in memory for validation before streaming to ImageKit. |
-| **Authentication** | JWT + `cookie-parser` | Stateless token authorization stored in `httpOnly` cookies to mitigate XSS risks. |
+| **Authentication** | JWT + `Authorization: Bearer` Header | Stateless token authorization using Bearer headers (with `httpOnly` cookie fallback) for cross-domain resilience. |
 | **Password Hashing** | `bcryptjs` | Industry-standard slow hashing algorithm with automated salting. |
 | **Hosting (Target)** | Vercel (Client) + Render (Server) | Edge-cached static delivery for the frontend SPA and persistent Node.js process for WebSockets. |
 
@@ -102,9 +102,10 @@
 1. **HTTP / REST API**: Used for standard request-response operations including registration, login, profile editing, contact search, and paginated conversation history retrieval.
 2. **WebSockets (Socket.io)**: A persistent TCP connection is established upon authentication. When a user opens a conversation, the client joins a dedicated room (`socket.join(conversationId)`). Messages emitted to the server are saved to MongoDB and immediately broadcast to all sockets in that room.
 3. **Authentication Lifecycle**:
-   - On signup or login, the server signs a JWT payload containing the user's `_id` and sets it as an `httpOnly` cookie with `SameSite: 'Lax'` (`'None'` in production) and `secure: true`.
-   - Subsequent REST requests include this cookie automatically. `authMiddleware` validates the token and attaches the user document to `req.user`.
-   - During the Socket.io handshake, the cookie is read and verified so real-time socket events remain strictly authenticated.
+   - On signup or login, the server issues a signed JWT token in the JSON response and sets an `httpOnly` cookie with `SameSite: 'none'` and `secure: true`.
+   - The React client saves the token and an Axios request interceptor automatically attaches `Authorization: Bearer <token>` on all outgoing REST requests, ensuring requests succeed even when browsers block third-party cross-site cookies between `.vercel.app` and `.onrender.com`.
+   - `authMiddleware` validates the token from the Bearer header (or cookie) and attaches `req.user`.
+   - During the Socket.io handshake, the token is passed in `socket.handshake.auth.token` (or cookies) so real-time socket events remain strictly authenticated.
 
 ---
 
@@ -219,10 +220,10 @@ Open your browser at `http://localhost:5173` to test the application.
 - **Why**: Chat messaging is inherently event-driven. Polling requires clients to send continuous HTTP requests every few seconds, generating wasted server CPU cycles and network overhead when no new messages exist, while still introducing an artificial latency gap equal to the polling interval. WebSockets maintain a single persistent full-duplex TCP connection, allowing the server to push messages instantly.
 - **Trade-off**: WebSockets are stateful. While stateless REST APIs scale trivially across serverless functions, WebSocket servers must maintain open socket connections in memory. Scaling WebSockets horizontally requires persistent backend instances and an adapter (such as Redis Pub/Sub) to broadcast events between server nodes.
 
-### 2. JWT in `httpOnly` Cookies vs. `localStorage`
-- **Decision**: Stored JSON Web Tokens inside `httpOnly`, `SameSite` cookies with an Authorization header fallback, rather than storing them in browser `localStorage`.
-- **Why**: Tokens stored in `localStorage` are fully accessible to any JavaScript executing in the browser window. If an application suffers from a Cross-Site Scripting (XSS) vulnerability, an injected script can immediately exfiltrate the token. Setting the `httpOnly` flag instructs the browser that JavaScript cannot read the cookie, mitigating token theft via XSS.
-- **Trade-off**: Cookies require careful cross-origin resource sharing (CORS) configuration (`credentials: true`), exact origin specification (wildcards `*` are disallowed when credentials are true), and protection considerations against Cross-Site Request Forgery (CSRF).
+### 2. JWT: `Authorization: Bearer` Header + `httpOnly` Cookie Fallback
+- **Decision**: Implemented a dual-authentication strategy using the `Authorization: Bearer <token>` header via Axios request interceptors alongside `httpOnly` cookies.
+- **Why**: While `httpOnly` cookies are ideal for same-domain apps to mitigate XSS risks, modern browsers (Chrome, Safari, Brave) block third-party cross-site cookies by default when the frontend (`vercel.app`) and backend (`onrender.com`) are on different root domains. Attaching the JWT in the `Authorization: Bearer` header guarantees that every API call from Vercel to Render is authenticated without being dropped by browser cross-site cookie policies.
+- **Trade-off**: Storing the token in `localStorage` requires diligence against XSS vulnerabilities (which we address by sanitizing inputs and avoiding `dangerouslySetInnerHTML`). The benefit is complete cross-domain reliability and immediate readiness for mobile/desktop clients.
 
 ### 3. ImageKit Cloud Storage vs. Local Filesystem
 - **Decision**: Used ImageKit with Multer memory buffers (`memoryStorage`) to handle avatar uploads rather than saving images directly to the server's local disk.
@@ -260,13 +261,13 @@ These features were intentionally excluded from the initial v1 scope to focus on
 *(Personal prep sheet: quick spoken summaries to explain this project confidently in an interview setting)*
 
 ### 30-Second Elevator Pitch
-> *"I built a full-stack real-time chat application using the MERN stack and Socket.io. It supports instant 1-on-1 and group conversations, live typing indicators, and online presence tracking. I implemented secure JWT authentication using httpOnly cookies to guard against XSS token theft, and integrated ImageKit with Multer memory buffers so user avatars are hosted permanently on a CDN rather than being wiped by ephemeral server restarts. The frontend is built in React and styled with a custom warm editorial Tailwind design that is fully responsive."*
+> *"I built a full-stack real-time chat application using the MERN stack and Socket.io. It supports instant 1-on-1 and group conversations, live typing indicators, and online presence tracking. I implemented stateless JWT authentication using the Authorization Bearer header to ensure seamless cross-domain requests between Vercel and Render without being blocked by third-party cookie restrictions, and integrated ImageKit with Multer memory buffers so user avatars are hosted permanently on a CDN rather than being wiped by ephemeral server restarts. The frontend is built in React and styled with a custom warm editorial Tailwind design that is fully responsive."*
 
 ### 2-Minute Architectural Deep-Dive
 > *"When designing this chat app, my main priority was keeping a clean separation between request-response operations and real-time event streaming.*
 >
 > *For bootstrapping and persistence, the React frontend talks to an Express REST API. That handles registration, login, profile editing, and fetching paginated conversation history from MongoDB. But for the messaging itself, I used Socket.io to establish a persistent full-duplex WebSocket connection. Whenever a user opens a conversation, the client joins a socket room identified by the conversation ID. When someone sends a message, the server validates it, saves it to MongoDB, and immediately broadcasts it to everyone in that room in milliseconds.*
 >
-> *One technical decision I focused on was storage and security. For authentication, instead of storing the JWT in localStorage where it's vulnerable to XSS attacks, I configured httpOnly cookies with strict CORS credentials, which keeps tokens inaccessible to client JavaScript. For avatar images, because platforms like Render use ephemeral containers that wipe files on restart, I used Multer with memoryStorage to buffer incoming files in RAM, validate that they're strictly JPGs under 2MB, and stream them directly to ImageKit's CDN.*
+> *One technical decision I focused on was cross-domain authorization and storage. Because our frontend is on Vercel and backend is on Render across two different root domains, modern browsers block third-party cookies by default. To solve this, I configured an Axios request interceptor that automatically attaches an Authorization: Bearer token to all outgoing requests, while the backend authMiddleware validates both Bearer headers and cookies. For avatar images, because platforms like Render use ephemeral containers that wipe files on restart, I used Multer with memoryStorage to buffer incoming files in RAM, validate that they're strictly JPGs under 2MB, and stream them directly to ImageKit's CDN.*
 >
 > *If I were taking this further, my next step would be adding a Redis adapter to Socket.io so multiple backend instances can broadcast events across each other, and adding Web Push notifications for background alerts."*

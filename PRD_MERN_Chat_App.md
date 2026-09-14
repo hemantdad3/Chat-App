@@ -25,7 +25,7 @@ A web-based real-time messaging application built on the MERN stack (MongoDB, Ex
 | Real-time | Socket.io |
 | Cloud Storage | ImageKit (Node.js SDK) for avatar hosting |
 | Uploads | Multer (memoryStorage buffer) |
-| Auth | JWT (access token), bcryptjs for password hashing |
+| Auth | JWT (`Authorization: Bearer` header with `httpOnly` cookie fallback), bcryptjs for password hashing |
 | Styling | Tailwind CSS (Warm & Editorial palette) |
 
 ## 5. User Roles
@@ -38,8 +38,8 @@ A web-based real-time messaging application built on the MERN stack (MongoDB, Ex
 - Sign up with full name, required unique username (`@username`, 3–30 alphanumeric/underscore), email, password, and optional avatar image (JPG only, under 2MB).
 - Log in with email/password → returns JWT and user profile data (`name`, `username`, `avatarUrl`, `bio`).
 - Passwords hashed with bcrypt before storage.
-- JWT stored client-side (httpOnly cookie with fallback to Authorization header) and validated on protected routes/sockets.
-- Logout clears session/token
+- JWT sent client-side via `Authorization: Bearer <token>` header (with `httpOnly` cookie support) and validated by `authMiddleware` on protected routes and socket handshakes.
+- Logout clears session/token (removes localStorage token and clears cookie).
 
 ### 6.2 1-on-1 Chat
 - Search/select a user to start a direct conversation

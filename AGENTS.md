@@ -39,7 +39,7 @@
 All phases across backend and frontend are 100% delivered and verified live in production:
 
 1. **Phase 1: Setup & Scaffolding** — Directory structure, dependencies, `.env` config, MongoDB connection, Vite + Tailwind frontend. (✅ Completed)
-2. **Phase 2: Authentication** — Signup, login, logout, JWT middleware, httpOnly cookies, protected routes. (✅ Completed)
+2. **Phase 2: Authentication** — Signup, login, logout, JWT middleware, Authorization Bearer tokens & httpOnly cookies, protected routes. (✅ Completed)
 3. **Phase 3: Core 1-on-1 Messaging** — User search, Conversation/Message models, REST endpoints, Socket send/receive, chat UI. (✅ Completed)
 4. **Phase 4: Presence & Typing** — Online/offline socket tracking, typing indicators with debounce. (✅ Completed)
 5. **Phase 5: Group Chat** — Group creation, admin member management, group socket broadcasts. (✅ Completed)

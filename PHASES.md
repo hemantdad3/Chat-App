@@ -9,7 +9,7 @@ This document outlines the step-by-step implementation plan for the **MERN Real-
 | Phase | Description | Backend Scope | Frontend Scope | Status |
 |---|---|---|---|---|
 | **Phase 1** | Setup & Scaffolding | Express, Mongoose, Socket.io, .env config, MongoDB test | Vite + React + Tailwind CSS scaffold, folder structure, Axios instance | ✅ Completed |
-| **Phase 2** | Authentication | Signup, Login, Logout, JWT (httpOnly cookie), Auth middleware | Auth pages (/signup, /login), AuthForm, AuthContext, ProtectedRoute | ✅ Completed |
+| **Phase 2** | Authentication | Signup, Login, Logout, JWT (Bearer header + httpOnly cookie), Auth middleware | Auth pages (/signup, /login), AuthForm, AuthContext, ProtectedRoute | ✅ Completed |
 | **Phase 3** | Core 1-on-1 Messaging | User search, Conversation & Message models, REST endpoints, Socket send/receive | Sidebar conversations, ChatWindow, MessageBubble, MessageInput, NewChatModal | ✅ Completed |
 | **Phase 4** | Presence & Typing | Socket connection/disconnect tracking, online status broadcast, typing events | OnlineStatusDot, TypingIndicator with debounce, real-time presence indicators | ✅ Completed |
 | **Phase 5** | Group Chat | Group creation, member add/remove, admin checks, group message broadcast | NewGroupModal, Group member list management UI, sender names on messages | ✅ Completed |
@@ -53,7 +53,7 @@ Initialize the repository architecture, install core dependencies, configure env
 ## Phase 2: Authentication
 
 ### Goal
-Implement full end-to-end user authentication with password hashing, secure JWT transmission via httpOnly cookies, protected routes, and session persistence.
+Implement full end-to-end user authentication with password hashing, secure JWT transmission via Authorization Bearer headers and httpOnly cookies, protected routes, and session persistence.
 
 ### Backend Scope (`/server`)
 - **Model**: `User.js` (`name`, `email`, `passwordHash`, `isOnline`, `lastSeen`, `createdAt`).
