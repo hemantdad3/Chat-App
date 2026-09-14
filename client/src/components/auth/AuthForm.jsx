@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
-  MessageSquare,
   Camera,
   AtSign,
 } from 'lucide-react';
@@ -138,9 +137,6 @@ const AuthForm = ({ mode }) => {
     <div className="w-full max-w-md bg-sand-light border border-ink-border rounded-2xl p-6 sm:p-8 shadow-sm max-h-[92vh] overflow-y-auto">
       {/* Header */}
       <div className="flex flex-col items-center text-center mb-6">
-        <div className="p-3 bg-sand border border-ink-border rounded-2xl text-terracotta mb-3">
-          <MessageSquare className="w-7 h-7" />
-        </div>
         <h1 className="text-2xl font-semibold tracking-tight text-ink font-serif">
           {isSignup ? 'Create an Account' : 'Welcome Back'}
         </h1>
