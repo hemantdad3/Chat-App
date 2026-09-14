@@ -122,7 +122,6 @@ const ChatWindow = ({ onBack }) => {
                 src={otherParticipant?.avatarUrl}
                 name={displayName}
                 size="md"
-                isOnline={isOnline}
                 onClick={() => setViewingUser(otherParticipant)}
                 className="cursor-pointer hover:opacity-90 transition-opacity"
               />

@@ -83,20 +83,13 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <h3
-              className={`text-xs sm:text-sm truncate ${
-                unreadCount > 0 ? 'font-bold text-ink' : 'font-medium text-ink'
-              }`}
-            >
-              {displayName}
-            </h3>
-            {!conversation.isGroup && otherParticipant?.username && (
-              <span className="text-[10px] text-ink-muted truncate hidden sm:inline">
-                @{otherParticipant.username}
-              </span>
-            )}
-          </div>
+          <h3
+            className={`text-xs sm:text-sm truncate ${
+              unreadCount > 0 ? 'font-bold text-ink' : 'font-medium text-ink'
+            }`}
+          >
+            {displayName}
+          </h3>
           {lastMsgTime && (
             <span
               className={`text-[10px] shrink-0 ${
