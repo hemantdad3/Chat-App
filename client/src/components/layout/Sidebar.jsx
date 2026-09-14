@@ -4,7 +4,9 @@ import { useAuth } from '../../context/AuthContext';
 import ConversationListItem from '../chat/ConversationListItem';
 import NewChatModal from '../modals/NewChatModal';
 import NewGroupModal from '../modals/NewGroupModal';
-import { MessageSquarePlus, Users, LogOut, MessageSquare, Loader2 } from 'lucide-react';
+import ProfileModal from '../modals/ProfileModal';
+import Avatar from '../common/Avatar';
+import { MessageSquarePlus, Users, LogOut, MessageSquare, Loader2, UserCog } from 'lucide-react';
 
 /**
  * Sidebar Component
@@ -22,6 +24,7 @@ const Sidebar = () => {
 
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
   const [isNewGroupOpen, setIsNewGroupOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
     <aside className="w-full md:w-80 lg:w-96 h-full flex flex-col bg-cream-dark border-r border-sand-dark shrink-0">
@@ -104,22 +107,44 @@ const Sidebar = () => {
 
       {/* User profile footer */}
       <div className="p-3 border-t border-sand-dark bg-sand/40 flex items-center justify-between">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-sand-dark text-ink font-bold text-xs flex items-center justify-center shrink-0 border border-sand-dark">
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
+        <div
+          onClick={() => setIsProfileOpen(true)}
+          className="flex items-center gap-2.5 min-w-0 cursor-pointer group flex-1 mr-2"
+          title="Edit your profile"
+        >
+          <Avatar
+            src={user?.avatarUrl}
+            name={user?.name}
+            size="sm"
+            className="group-hover:ring-2 group-hover:ring-terracotta/40 rounded-xl transition-all"
+          />
           <div className="min-w-0">
-            <h4 className="text-xs font-semibold text-ink truncate">{user?.name}</h4>
+            <h4 className="text-xs font-semibold text-ink truncate group-hover:text-terracotta transition-colors">
+              {user?.name}
+            </h4>
+            <p className="text-[10px] text-ink-muted truncate">
+              @{user?.username || 'user'}
+            </p>
           </div>
         </div>
 
-        <button
-          onClick={logout}
-          className="p-2 text-ink-muted hover:text-terracotta hover:bg-sand rounded-xl transition-colors cursor-pointer"
-          title="Log Out"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setIsProfileOpen(true)}
+            className="p-2 text-ink-muted hover:text-terracotta hover:bg-sand rounded-xl transition-colors cursor-pointer"
+            title="Edit Profile"
+          >
+            <UserCog className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={logout}
+            className="p-2 text-ink-muted hover:text-terracotta hover:bg-sand rounded-xl transition-colors cursor-pointer"
+            title="Log Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Modals */}
@@ -132,6 +157,11 @@ const Sidebar = () => {
       <NewGroupModal
         isOpen={isNewGroupOpen}
         onClose={() => setIsNewGroupOpen(false)}
+      />
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
       />
     </aside>
   );

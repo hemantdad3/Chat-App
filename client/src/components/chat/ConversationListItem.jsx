@@ -3,6 +3,7 @@ import { Users } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 import { useChat } from '../../context/ChatContext';
 import OnlineStatusDot from './OnlineStatusDot';
+import Avatar from '../common/Avatar';
 
 /**
  * Format timestamp for list item
@@ -65,32 +66,37 @@ const ConversationListItem = ({ conversation, currentUserId, isActive, onSelect 
     >
       {/* Avatar with Online indicator badge */}
       <div className="relative shrink-0">
-        <div className="w-11 h-11 rounded-xl bg-sand-dark/60 border border-sand-dark text-ink font-semibold flex items-center justify-center text-sm">
-          {conversation.isGroup ? (
+        {conversation.isGroup ? (
+          <div className="w-10 h-10 rounded-xl bg-sand-dark/60 border border-sand-dark text-ink font-semibold flex items-center justify-center text-sm">
             <Users className="w-5 h-5 text-ink-muted" />
-          ) : (
-            displayName.charAt(0).toUpperCase()
-          )}
-        </div>
-
-        {/* Online status dot badge */}
-        {!conversation.isGroup && (
-          <div className="absolute -bottom-0.5 -right-0.5 p-0.5 bg-cream rounded-full">
-            <OnlineStatusDot isOnline={isOnline} />
           </div>
+        ) : (
+          <Avatar
+            src={otherParticipant?.avatarUrl}
+            name={displayName}
+            isOnline={isOnline}
+            size="md"
+          />
         )}
       </div>
 
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <h3
-            className={`text-xs sm:text-sm truncate flex items-center gap-1.5 ${
-              unreadCount > 0 ? 'font-bold text-ink' : 'font-medium text-ink'
-            }`}
-          >
-            {displayName}
-          </h3>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <h3
+              className={`text-xs sm:text-sm truncate ${
+                unreadCount > 0 ? 'font-bold text-ink' : 'font-medium text-ink'
+              }`}
+            >
+              {displayName}
+            </h3>
+            {!conversation.isGroup && otherParticipant?.username && (
+              <span className="text-[10px] text-ink-muted truncate hidden sm:inline">
+                @{otherParticipant.username}
+              </span>
+            )}
+          </div>
           {lastMsgTime && (
             <span
               className={`text-[10px] shrink-0 ${

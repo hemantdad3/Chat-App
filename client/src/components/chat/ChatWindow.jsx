@@ -7,6 +7,8 @@ import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import OnlineStatusDot from './OnlineStatusDot';
 import GroupInfoModal from '../modals/GroupInfoModal';
+import UserProfileModal from '../modals/UserProfileModal';
+import Avatar from '../common/Avatar';
 import { MessageSquare, ArrowLeft, Loader2, Users, Info } from 'lucide-react';
 
 /**
@@ -25,6 +27,7 @@ const ChatWindow = ({ onBack }) => {
 
   const [typingUsers, setTypingUsers] = useState([]);
   const [isGroupInfoOpen, setIsGroupInfoOpen] = useState(false);
+  const [viewingUser, setViewingUser] = useState(null);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom on new message or typing indicator update
@@ -110,18 +113,28 @@ const ChatWindow = ({ onBack }) => {
 
           {/* Avatar */}
           <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-sand border border-sand-dark flex items-center justify-center font-semibold text-sm text-ink">
-              {activeConversation.isGroup ? (
+            {activeConversation.isGroup ? (
+              <div className="w-10 h-10 rounded-xl bg-sand border border-sand-dark flex items-center justify-center font-semibold text-sm text-ink">
                 <Users className="w-5 h-5 text-ink-muted" />
-              ) : (
-                displayName.charAt(0).toUpperCase()
-              )}
-            </div>
+              </div>
+            ) : (
+              <Avatar
+                src={otherParticipant?.avatarUrl}
+                name={displayName}
+                size="md"
+                isOnline={isOnline}
+                onClick={() => setViewingUser(otherParticipant)}
+                className="cursor-pointer hover:opacity-90 transition-opacity"
+              />
+            )}
           </div>
 
-          <div>
+          <div
+            onClick={() => !activeConversation.isGroup && otherParticipant && setViewingUser(otherParticipant)}
+            className={!activeConversation.isGroup ? 'cursor-pointer group' : ''}
+          >
             <div className="flex items-center gap-2">
-              <h2 className="text-sm sm:text-base font-bold text-ink tracking-tight">
+              <h2 className="text-sm sm:text-base font-bold text-ink tracking-tight group-hover:text-terracotta transition-colors">
                 {displayName}
               </h2>
             </div>
@@ -129,7 +142,12 @@ const ChatWindow = ({ onBack }) => {
               {activeConversation.isGroup ? (
                 <span>{activeConversation.members?.length || 0} members</span>
               ) : (
-                <OnlineStatusDot isOnline={isOnline} showText={true} />
+                <>
+                  {otherParticipant?.username && (
+                    <span>@{otherParticipant.username} •</span>
+                  )}
+                  <OnlineStatusDot isOnline={isOnline} showText={true} />
+                </>
               )}
             </div>
           </div>
@@ -169,6 +187,7 @@ const ChatWindow = ({ onBack }) => {
               message={msg}
               isOwn={msg.sender?._id?.toString() === user?._id?.toString()}
               isGroup={activeConversation.isGroup}
+              onViewProfile={(sender) => setViewingUser(sender)}
             />
           ))
         )}
@@ -193,6 +212,13 @@ const ChatWindow = ({ onBack }) => {
           conversation={activeConversation}
         />
       )}
+
+      {/* User Profile Popover / Modal */}
+      <UserProfileModal
+        isOpen={!!viewingUser}
+        onClose={() => setViewingUser(null)}
+        targetUser={viewingUser}
+      />
     </div>
   );
 };

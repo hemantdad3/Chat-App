@@ -99,6 +99,8 @@ const initSocket = (io) => {
         user: {
           _id: socket.user._id,
           name: socket.user.name,
+          username: socket.user.username,
+          avatarUrl: socket.user.avatarUrl,
         },
       });
     });
@@ -159,7 +161,7 @@ const initSocket = (io) => {
 
         const populatedMessage = await Message.findById(message._id).populate(
           'sender',
-          'name email'
+          'name email username avatarUrl bio'
         );
 
         // Broadcast to all sockets in conversation room

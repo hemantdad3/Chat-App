@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import chatService from '../../services/chatService';
 import { useChat } from '../../context/ChatContext';
 import { useAuth } from '../../context/AuthContext';
+import Avatar from '../common/Avatar';
+import UserProfileModal from './UserProfileModal';
 import { X, Users, Shield, UserMinus, UserPlus, Edit2, Check, Loader2, Search } from 'lucide-react';
 
 /**
@@ -19,6 +21,7 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loadingAction, setLoadingAction] = useState(false);
   const [addingUserId, setAddingUserId] = useState(null);
+  const [viewingUser, setViewingUser] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -236,13 +239,15 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                     className="p-2 bg-cream border border-ink-border/60 rounded-lg flex items-center justify-between hover:border-ink-border transition-colors"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-sand-dark text-terracotta flex items-center justify-center text-xs font-semibold shrink-0">
-                        {u.name?.charAt(0).toUpperCase()}
+                      <Avatar src={u.avatarUrl} name={u.name} size="xs" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-medium text-ink truncate block">
+                          {u.name}
+                        </span>
+                        <span className="text-[10px] text-ink-muted truncate block">
+                          @{u.username || 'user'}
+                        </span>
                       </div>
-                      {/* Strictly show username only - no email/gmail id */}
-                      <span className="text-xs font-medium text-ink truncate">
-                        {u.name}
-                      </span>
                     </div>
 
                     <button
@@ -278,13 +283,15 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                 key={m._id}
                 className="p-2.5 bg-sand border border-ink-border/50 rounded-xl flex items-center justify-between"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-cream border border-ink-border text-terracotta flex items-center justify-center text-xs font-semibold">
-                    {m.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-ink">
+                <div
+                  onClick={() => setViewingUser(m)}
+                  className="flex items-center gap-2.5 min-w-0 cursor-pointer group"
+                  title="View profile"
+                >
+                  <Avatar src={m.avatarUrl} name={m.name} size="sm" />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs font-medium text-ink group-hover:text-terracotta transition-colors truncate">
                         {m.name} {isMe && <span className="text-ink-muted">(You)</span>}
                       </span>
                       {memberIsAdmin && (
@@ -294,6 +301,9 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
                         </span>
                       )}
                     </div>
+                    <span className="text-[10px] text-ink-muted block truncate">
+                      @{m.username || 'user'}
+                    </span>
                   </div>
                 </div>
 
@@ -324,6 +334,13 @@ const GroupInfoModal = ({ isOpen, onClose, conversation }) => {
           </button>
         </div>
       </div>
+
+      {/* User Profile Popover */}
+      <UserProfileModal
+        isOpen={!!viewingUser}
+        onClose={() => setViewingUser(null)}
+        targetUser={viewingUser}
+      />
     </div>
   );
 };

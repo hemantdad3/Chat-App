@@ -1,7 +1,7 @@
 import api from './api';
 
 /**
- * Authentication service communicating with /api/auth endpoints
+ * Authentication and user profile service communicating with /api/auth and /api/users
  */
 const authService = {
   /**
@@ -35,6 +35,40 @@ const authService = {
    */
   getMe: async () => {
     const response = await api.get('/auth/me');
+    return response.data;
+  },
+
+  /**
+   * Update current user's profile (username, bio)
+   * @param {{ username?: string, bio?: string }} profileData
+   */
+  updateProfile: async (profileData) => {
+    const response = await api.patch('/users/me', profileData);
+    return response.data;
+  },
+
+  /**
+   * Upload user avatar image to ImageKit via backend
+   * @param {File} imageFile
+   */
+  uploadAvatar: async (imageFile) => {
+    const formData = new FormData();
+    formData.append('avatar', imageFile);
+
+    const response = await api.post('/users/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Get public profile of a user by ID
+   * @param {string} userId
+   */
+  getUserProfile: async (userId) => {
+    const response = await api.get(`/users/${userId}`);
     return response.data;
   },
 };

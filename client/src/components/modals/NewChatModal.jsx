@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import chatService from '../../services/chatService';
+import Avatar from '../common/Avatar';
 import { Search, X, User, Loader2, MessageSquarePlus } from 'lucide-react';
 
 /**
@@ -102,12 +103,14 @@ const NewChatModal = ({ isOpen, onClose, onSelectUser }) => {
                 onClick={() => handleSelect(u._id)}
                 className="p-3 rounded-xl bg-sand hover:bg-sand-dark border border-ink-border/50 flex items-center justify-between cursor-pointer transition-all"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-cream border border-ink-border text-terracotta flex items-center justify-center font-semibold text-sm">
-                    {u.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-ink">{u.name}</h4>
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar src={u.avatarUrl} name={u.name} size="md" />
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-medium text-ink truncate">{u.name}</h4>
+                    <p className="text-[11px] text-ink-muted truncate">@{u.username || 'user'}</p>
+                    {u.bio && (
+                      <p className="text-[10px] text-ink-faint truncate max-w-[200px]">{u.bio}</p>
+                    )}
                   </div>
                 </div>
 

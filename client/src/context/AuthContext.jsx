@@ -71,6 +71,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Update profile action (username, bio)
+  const updateProfile = async (profileData) => {
+    setError(null);
+    try {
+      const updatedUser = await authService.updateProfile(profileData);
+      setUser((prev) => ({ ...prev, ...updatedUser }));
+      return updatedUser;
+    } catch (err) {
+      const message = err.response?.data?.message || 'Failed to update profile';
+      setError(message);
+      throw new Error(message);
+    }
+  };
+
+  // Upload avatar image to ImageKit via backend
+  const uploadAvatar = async (imageFile) => {
+    setError(null);
+    try {
+      const updatedUser = await authService.uploadAvatar(imageFile);
+      setUser((prev) => ({ ...prev, ...updatedUser }));
+      return updatedUser;
+    } catch (err) {
+      const message = err.response?.data?.message || 'Failed to upload avatar';
+      setError(message);
+      throw new Error(message);
+    }
+  };
+
   const clearError = () => setError(null);
 
   return (
@@ -82,6 +110,8 @@ export const AuthProvider = ({ children }) => {
         signup,
         login,
         logout,
+        updateProfile,
+        uploadAvatar,
         clearError,
         isAuthenticated: !!user,
       }}

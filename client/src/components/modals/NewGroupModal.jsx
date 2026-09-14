@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import chatService from '../../services/chatService';
 import { useChat } from '../../context/ChatContext';
+import Avatar from '../common/Avatar';
 import { Search, X, Users, Check, Loader2 } from 'lucide-react';
 
 /**
@@ -177,12 +178,11 @@ const NewGroupModal = ({ isOpen, onClose }) => {
                       : 'bg-sand hover:bg-sand-dark border-ink-border/50 text-ink'
                     }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-cream border border-ink-border text-terracotta flex items-center justify-center text-xs font-semibold">
-                      {u.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-medium text-ink">{u.name}</h4>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Avatar src={u.avatarUrl} name={u.name} size="sm" />
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-medium text-ink truncate">{u.name}</h4>
+                      <p className="text-[10px] text-ink-muted truncate">@{u.username || 'user'}</p>
                     </div>
                   </div>
 

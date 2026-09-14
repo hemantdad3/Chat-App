@@ -13,13 +13,13 @@ const getConversations = async (req, res) => {
     const conversations = await Conversation.find({
       members: currentUserId,
     })
-      .populate('members', 'name email isOnline lastSeen')
-      .populate('admins', 'name email')
+      .populate('members', 'name email username avatarUrl bio isOnline lastSeen')
+      .populate('admins', 'name email username avatarUrl bio')
       .populate({
         path: 'lastMessage',
         populate: {
           path: 'sender',
-          select: 'name email',
+          select: 'name email username avatarUrl bio',
         },
       })
       .sort({ updatedAt: -1 });
@@ -62,10 +62,10 @@ const createOrGetConversation = async (req, res) => {
         isGroup: false,
         members: { $all: [currentUserId, recipientId], $size: 2 },
       })
-        .populate('members', 'name email isOnline lastSeen')
+        .populate('members', 'name email username avatarUrl bio isOnline lastSeen')
         .populate({
           path: 'lastMessage',
-          populate: { path: 'sender', select: 'name email' },
+          populate: { path: 'sender', select: 'name email username avatarUrl bio' },
         });
 
       if (conversation) {
@@ -82,7 +82,7 @@ const createOrGetConversation = async (req, res) => {
 
       conversation = await Conversation.findById(newConversation._id).populate(
         'members',
-        'name email isOnline lastSeen'
+        'name email username avatarUrl bio isOnline lastSeen'
       );
 
       return res.status(201).json(conversation);
@@ -110,8 +110,8 @@ const createOrGetConversation = async (req, res) => {
       });
 
       const populatedGroup = await Conversation.findById(newGroup._id)
-        .populate('members', 'name email isOnline lastSeen')
-        .populate('admins', 'name email');
+        .populate('members', 'name email username avatarUrl bio isOnline lastSeen')
+        .populate('admins', 'name email username avatarUrl bio');
 
       // If socket server is available, emit event to notify members
       const io = req.app.get('io');
@@ -204,11 +204,11 @@ const updateGroup = async (req, res) => {
     await conversation.save();
 
     const updatedConversation = await Conversation.findById(conversationId)
-      .populate('members', 'name email isOnline lastSeen')
-      .populate('admins', 'name email')
+      .populate('members', 'name email username avatarUrl bio isOnline lastSeen')
+      .populate('admins', 'name email username avatarUrl bio')
       .populate({
         path: 'lastMessage',
-        populate: { path: 'sender', select: 'name email' },
+        populate: { path: 'sender', select: 'name email username avatarUrl bio' },
       });
 
     // Broadcast update to conversation room via Socket.io

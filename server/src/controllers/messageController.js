@@ -23,7 +23,7 @@ const getMessages = async (req, res) => {
     }
 
     const messages = await Message.find({ conversationId })
-      .populate('sender', 'name email')
+      .populate('sender', 'name email username avatarUrl bio')
       .sort({ createdAt: 1 });
 
     res.status(200).json(messages);
@@ -77,7 +77,7 @@ const sendMessage = async (req, res) => {
 
     const populatedMessage = await Message.findById(message._id).populate(
       'sender',
-      'name email'
+      'name email username avatarUrl bio'
     );
 
     // Broadcast over Socket.io if available

@@ -155,6 +155,8 @@ export const ChatProvider = ({ children }) => {
       sender: {
         _id: user._id,
         name: user.name,
+        username: user.username,
+        avatarUrl: user.avatarUrl,
         email: user.email,
       },
       content: content.trim(),
@@ -271,12 +273,93 @@ export const ChatProvider = ({ children }) => {
       });
     };
 
+    // Real-time profile updates (avatar, username, bio)
+    const handleUserProfileUpdated = (updatedUser) => {
+      setConversations((prev) =>
+        prev.map((conv) => {
+          let hasChange = false;
+          const newMembers = conv.members?.map((m) => {
+            if (m._id?.toString() === updatedUser.userId?.toString()) {
+              hasChange = true;
+              return { ...m, ...updatedUser, _id: updatedUser.userId };
+            }
+            return m;
+          });
+
+          const newAdmins = conv.admins?.map((a) => {
+            if (a._id?.toString() === updatedUser.userId?.toString()) {
+              hasChange = true;
+              return { ...a, ...updatedUser, _id: updatedUser.userId };
+            }
+            return a;
+          });
+
+          let newLastMessage = conv.lastMessage;
+          if (newLastMessage?.sender?._id?.toString() === updatedUser.userId?.toString()) {
+            newLastMessage = {
+              ...newLastMessage,
+              sender: { ...newLastMessage.sender, ...updatedUser, _id: updatedUser.userId },
+            };
+            hasChange = true;
+          }
+
+          if (hasChange) {
+            return {
+              ...conv,
+              members: newMembers,
+              admins: newAdmins,
+              lastMessage: newLastMessage,
+            };
+          }
+          return conv;
+        })
+      );
+
+      setActiveConversation((currentActive) => {
+        if (!currentActive) return currentActive;
+        const isMember = currentActive.members?.some(
+          (m) => m._id?.toString() === updatedUser.userId?.toString()
+        );
+        if (!isMember) return currentActive;
+
+        const newMembers = currentActive.members?.map((m) => {
+          if (m._id?.toString() === updatedUser.userId?.toString()) {
+            return { ...m, ...updatedUser, _id: updatedUser.userId };
+          }
+          return m;
+        });
+
+        const newAdmins = currentActive.admins?.map((a) => {
+          if (a._id?.toString() === updatedUser.userId?.toString()) {
+            return { ...a, ...updatedUser, _id: updatedUser.userId };
+          }
+          return a;
+        });
+
+        return { ...currentActive, members: newMembers, admins: newAdmins };
+      });
+
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.sender?._id?.toString() === updatedUser.userId?.toString()) {
+            return {
+              ...msg,
+              sender: { ...msg.sender, ...updatedUser, _id: updatedUser.userId },
+            };
+          }
+          return msg;
+        })
+      );
+    };
+
     socket.on('receive_message', handleReceiveMessage);
     socket.on('group_updated', handleGroupUpdated);
+    socket.on('user_profile_updated', handleUserProfileUpdated);
 
     return () => {
       socket.off('receive_message', handleReceiveMessage);
       socket.off('group_updated', handleGroupUpdated);
+      socket.off('user_profile_updated', handleUserProfileUpdated);
     };
   }, [socket, fetchConversations]);
 
