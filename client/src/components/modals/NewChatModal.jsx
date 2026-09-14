@@ -108,9 +108,6 @@ const NewChatModal = ({ isOpen, onClose, onSelectUser }) => {
                   <div className="min-w-0">
                     <h4 className="text-sm font-medium text-ink truncate">{u.name}</h4>
                     <p className="text-[11px] text-ink-muted truncate">@{u.username || 'user'}</p>
-                    {u.bio && (
-                      <p className="text-[10px] text-ink-faint truncate max-w-[200px]">{u.bio}</p>
-                    )}
                   </div>
                 </div>
 
