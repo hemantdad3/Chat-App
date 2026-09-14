@@ -14,6 +14,7 @@ This document outlines the step-by-step implementation plan for the **MERN Real-
 | **Phase 4** | Presence & Typing | Socket connection/disconnect tracking, online status broadcast, typing events | OnlineStatusDot, TypingIndicator with debounce, real-time presence indicators | ✅ Completed |
 | **Phase 5** | Group Chat | Group creation, member add/remove, admin checks, group message broadcast | NewGroupModal, Group member list management UI, sender names on messages | ✅ Completed |
 | **Phase 6** | Polish & UX | Input sanitization, validation, recent conversation sorting, unread counters | Unread badge/counter, auto-scroll chat window, responsive layout (mobile) | ✅ Completed |
+| **Phase 6.5** | User Profiles & Editorial UI | Username/bio models, ImageKit cloud avatars (JPG only <2MB), PATCH /api/users/me | ProfileModal, UserProfileModal popover, Lightbox preview, editorial UI refinements | ✅ Completed |
 | **Phase 7** | Deployment | Render Web Service config, CORS credentials, production env configuration | Vercel frontend config, environment variables, end-to-end live testing | ⏳ Pending |
 
 ---
@@ -210,6 +211,58 @@ Refine user experience, add unread message tracking, sort conversations by recen
 
 ### Suggested Git Commit
 `feat: phase 6 - unread badges, conversation sorting, and responsive layout`
+
+---
+
+## Phase 6.5: User Profiles, ImageKit Cloud Avatars & Editorial UI Polish
+
+### Goal
+Empower users to customize their personal identity with a unique username (`@username`), bio description, and persistent cloud avatar upload via ImageKit, while polishing UI elements to adhere strictly to the Warm & Editorial design language and eliminating visual duplication.
+
+### Backend Scope (`/server`)
+- **User Model Extensions**:
+  - `username`: String, unique, required, lowercase, trimmed, validated (3–30 chars, alphanumeric + underscores).
+  - `avatarUrl`: String, default empty / placeholder fallback.
+  - `bio`: String, default empty, max 150 characters.
+- **ImageKit Cloud Integration**:
+  - Multer memory storage middleware buffering files in RAM.
+  - ImageKit Node.js SDK initialized with environment variables (`IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT`).
+  - Strict JPG/JPEG validation: files must be `image/jpeg` or `image/pjpeg` and have `.jpg` or `.jpeg` extension under 2MB. Non-JPEG files (PNG, WebP, etc.) return HTTP 400.
+  - Avatars stored in `/chat_avatars/` folder with unique name `avatar_${userId}_${Date.now()}.${ext}`.
+- **Endpoints**:
+  - `POST /api/auth/signup`: Accepts registration with required `username` and optional avatar file upload via Multer buffer or JSON fallback.
+  - `PATCH /api/users/me`: Updates `username` (with duplicate check excluding current user) and `bio` (<= 150 chars).
+  - `POST /api/users/avatar`: Dedicated endpoint to upload and replace authenticated user avatar in ImageKit.
+  - `GET /api/users`: Search and list users, now projecting `_id, name, username, avatarUrl, bio, isOnline, lastSeen`.
+  - Populated user data (`username`, `avatarUrl`, `bio`) across `GET /api/conversations` and `GET /api/conversations/:id/messages`.
+- **Socket.io**:
+  - `user_profile_updated` event: Broadcasts live username, avatar, and bio updates across all connected sessions and active conversations.
+
+### Frontend Scope (`/client`)
+- **Design System**:
+  - Warm & Editorial palette: Cream (`#FAF6F0`), Sand (`#EFE7DC`), Terracotta (`#C1502E`), Ink (`#2B2B2B`), and Sage (`#4A6C4A`).
+  - Elegant serif headings (`font-serif`) paired with clean sans-serif UI typography.
+- **Components & Modals**:
+  - `ProfileModal.jsx`: Edit Profile dialog allowing live edit of username (`@username`), bio with character counter (`0/150`), and avatar upload. Avatar displays overlapping eye icon button (lightbox view) and camera icon button (file picker); redundant text buttons removed. Format hint clearly indicates "JPG only, under 2MB".
+  - **Avatar Lightbox Modal**: Reusable high-resolution preview modal with dark backdrop blur and close button, accessible from both `ProfileModal` and `UserProfileModal`.
+  - `UserProfileModal.jsx`: Read-only profile popover displayed when clicking user avatars/names in the chat header, group messages, or group directory. Displays large avatar with view button, name, `@username`, live presence indicator, bio, and a "Send Message" action.
+  - `NewChatModal.jsx`: Direct chat initiation modal with contact search showing avatar, name, and `@username` (bio text removed for clean list alignment).
+  - `NewGroupModal.jsx`: Group creation modal with contact selection list (showing avatar, name, and `@username`).
+- **UI Bug Fixes & Refinements**:
+  - Chat header online indicator: Removed duplicate green dot overlapping the avatar image; retained the clean single dot next to the "Online" status text.
+  - Messages sidebar list: Removed `@username` line from conversation items, displaying only display name, timestamp, and last message snippet for visual clarity.
+  - Auth page header: Removed stray dropdown/pill element from `AuthForm` card header so it starts cleanly with "Create an Account" / "Welcome Back".
+
+### Verification & Testing
+1. Test signup with unique username and optional JPG avatar. Verify non-JPG uploads are blocked with 400 Bad Request.
+2. Edit username and bio in `ProfileModal` — verify character counter at 150 limit and uniqueness validation.
+3. Test avatar view lightbox in both `ProfileModal` and `UserProfileModal`.
+4. Verify chat header shows only ONE online indicator dot next to status text.
+5. Verify Messages sidebar displays name only without `@username` clutter.
+6. Verify Start New Chat modal shows name and `@username` only without bio text.
+
+### Suggested Git Commit
+`feat: phase 6.5 - user profiles, imagekit cloud avatars, and editorial UI polish`
 
 ---
 
