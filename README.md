@@ -238,6 +238,10 @@ Open your browser at `http://localhost:5173` to test the application.
 - **Challenge**: As features were developed iteratively across phases, several UI elements accumulated redundant controls and duplicated visual feedback. Specifically, the chat header was displaying two green online indicators for the same user (one badge dot overlapping the avatar and a second dot adjacent to the "Online" text), the Messages sidebar list was rendering redundant `@username` text below display names that crowded small screens, and the profile editor had four separate avatar actions (two overlapping icon badges plus two duplicate text buttons below).
 - **Solution**: We audited each component's visual hierarchy. In `ChatWindow`, we removed the avatar badge dot in the header, keeping only the status text indicator dot. In `ConversationListItem`, we removed the `@username` line to prioritize clean last-message previews. In `ProfileModal`, we eliminated the redundant text buttons, leaving two clean, high-contrast icon badges overlapping the avatar (an eye icon to trigger full-size lightbox preview and a camera icon to trigger native JPG file selection).
 
+### 6. Challenge Encountered: Cross-Origin Third-Party Cookie Blocking
+- **Challenge**: When deploying the frontend on Vercel (`vercel.app`) and the backend on Render (`onrender.com`), requests cross between two different top-level domains. Modern browsers (Chrome, Safari, Brave) block third-party cross-site cookies by default. As a result, requests like `GET /api/users` arrived at Render without the `jwt` cookie, returning `401 Unauthorized` and causing the contact search modal to show an empty user list.
+- **Solution**: We implemented a dual-authentication strategy. In `client/src/services/api.js`, an Axios request interceptor attaches `Authorization: Bearer <token>` from `localStorage` as a cross-origin fallback, and `AuthContext` was updated to persist the token across sessions. The backend's `authMiddleware` checks cookies first and smoothly falls back to the Bearer header, resolving cross-domain authentication across all browsers.
+
 ---
 
 ## Possible Future Improvements

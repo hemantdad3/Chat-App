@@ -156,29 +156,28 @@ A web-based real-time messaging application built on the MERN stack (MongoDB, Ex
 ## 12. Deployment
 
 **Target:** Backend on Render (web service), Frontend on Vercel, Database on MongoDB Atlas.
+### 12.1 Backend Deployment (Render)
+- Web Service on Render running persistent Node.js process (`node server.js`).
+- Live URL: `https://chat-app-ygvp.onrender.com`
+- Environment variables: `PORT`, `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, `NODE_ENV=production`, `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT`.
+- Health check route: `GET /api/health` returns `200 OK`.
 
-### 12.1 Backend (Render)
-- Deploy as a Render "Web Service" connected to the GitHub repo (root: `/server`)
-- Build command: `npm install`
-- Start command: `node server.js` (or `npm start`)
-- Environment variables to set in Render dashboard: `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, `PORT`
-- Free tier note: the service spins down after 15 minutes of inactivity and takes ~30–60 seconds to cold-start on the next request. Acceptable for a demo/portfolio project; upgrade to a paid instance before relying on this for real users.
-- Socket.io requires a persistent process, which Render's web service model supports (unlike serverless platforms) — this is the main reason backend goes here and not Vercel.
+### 12.2 Frontend Deployment (Vercel)
+- Static SPA deployed on Vercel with edge caching.
+- Live URL: `https://chat-app-phi-five-zoj1xpxkxv.vercel.app/`
+- SPA rewrites configured in `vercel.json` (`/(.*)` -> `/`) to prevent 404s on deep links.
+- Environment variables: `VITE_API_URL=https://chat-app-ygvp.onrender.com/api`, `VITE_SOCKET_URL=https://chat-app-ygvp.onrender.com`.
 
-### 12.2 Frontend (Vercel)
-- Deploy the `/client` React app directly from the GitHub repo
-- Vercel auto-detects the build (`npm run build`) and output directory
-- Environment variable: `VITE_API_URL` / `REACT_APP_API_URL` pointing to the Render backend URL, plus the matching socket URL for `socket.io-client`
-
-### 12.3 Cross-Origin / Auth Config
-- Configure CORS on the Express server to explicitly allow the Vercel domain (`https://your-app.vercel.app`), with `credentials: true`
-- If using httpOnly cookies for JWT, set `sameSite: 'none'` and `secure: true` on the cookie (required for cross-domain cookies over HTTPS)
-- Socket.io server CORS config must also allow the Vercel origin
+### 12.3 Cross-Origin / Auth Config & Bearer Fallback
+- CORS configured on Express server: `origin: process.env.CLIENT_URL` with `credentials: true`.
+- Dual-auth strategy:
+  - Primary: `httpOnly` cookie with `sameSite: 'none'` and `secure: true` for HTTPS transmissions.
+  - Cross-Origin Fallback: Axios request interceptor attaches `Authorization: Bearer <token>` from `localStorage` on all API requests, overcoming third-party cookie restrictions between disparate domains (`.vercel.app` vs `.onrender.com`).
+  - Socket.io handshake checks both cookies and `socket.handshake.auth.token`.
 
 ### 12.4 Known Trade-offs
-- Cold starts on Render free tier mean the first user after idle time may see a delayed connection/failed socket handshake that retries once the server wakes
-- No persistent local file storage on Render between deploys (not a concern for v1 since there's no file upload feature)
-- Plan to upgrade Render to a paid instance if/when moving beyond demo use
+- Cold starts on Render free tier mean the first request after 15 minutes of idle time may take ~50 seconds while the container spins up.
+- Cloud avatars stored permanently on ImageKit CDN, eliminating disk-persistence concerns on Render's ephemeral containers.
 
 ## 13. Open Questions / Future Enhancements
 - Media/file sharing (chat attachments)

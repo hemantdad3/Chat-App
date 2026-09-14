@@ -11,12 +11,13 @@
 ---
 
 ## 2. Tech Stack
-- **Backend**: Node.js, Express, MongoDB (Mongoose), Socket.io, JWT (stored in httpOnly cookie with header fallback), bcryptjs.
-- **Frontend**: React (Vite), Tailwind CSS, Socket.io-client, Axios, React Router, Context API.
-- **Deployment**:
-  - Backend: Render Web Service (persistent Node.js process for WebSockets).
-  - Frontend: Vercel.
-  - Database: MongoDB Atlas.
+- **Backend**: Node.js, Express, MongoDB (Mongoose), Socket.io, JWT (stored in httpOnly cookie with Authorization Bearer header fallback), bcryptjs, Multer memory storage.
+- **Frontend**: React 19 (Vite), Tailwind CSS (Warm & Editorial palette), Socket.io-client, Axios (with Bearer interceptor), React Router, Context API.
+- **Cloud Storage**: ImageKit (Node.js SDK) for persistent avatar hosting (strictly JPG/JPEG only under 2MB).
+- **Live Production Deployment**:
+  - Backend: Render Web Service (`https://chat-app-ygvp.onrender.com`).
+  - Frontend: Vercel SPA (`https://chat-app-phi-five-zoj1xpxkxv.vercel.app/`).
+  - Database: MongoDB Atlas (`chatapp.lfk1c9a.mongodb.net`).
 
 ---
 
@@ -35,15 +36,16 @@
 ---
 
 ## 4. 7-Phase Execution Workflow
-Development MUST progress through the 7 phases sequentially. Complete both backend and frontend parts of a phase before moving to the next.
+All phases across backend and frontend are 100% delivered and verified live in production:
 
-1. **Phase 1: Setup & Scaffolding** — Directory structure, dependencies, `.env` config, MongoDB connection, Vite + Tailwind frontend.
-2. **Phase 2: Authentication** — Signup, login, logout, JWT middleware, httpOnly cookies, protected routes.
-3. **Phase 3: Core 1-on-1 Messaging** — User search, Conversation/Message models, REST endpoints, Socket send/receive, chat UI.
-4. **Phase 4: Presence & Typing** — Online/offline socket tracking, typing indicators with debounce.
-5. **Phase 5: Group Chat** — Group creation, admin member management, group socket broadcasts.
-6. **Phase 6: Polish & UX** — Unread badges, dynamic sorting by recent message, input validation/sanitization, responsive mobile layout.
-7. **Phase 7: Deployment** — Render backend configuration, Vercel frontend configuration, CORS/cookie adjustments, live end-to-end verification.
+1. **Phase 1: Setup & Scaffolding** — Directory structure, dependencies, `.env` config, MongoDB connection, Vite + Tailwind frontend. (✅ Completed)
+2. **Phase 2: Authentication** — Signup, login, logout, JWT middleware, httpOnly cookies, protected routes. (✅ Completed)
+3. **Phase 3: Core 1-on-1 Messaging** — User search, Conversation/Message models, REST endpoints, Socket send/receive, chat UI. (✅ Completed)
+4. **Phase 4: Presence & Typing** — Online/offline socket tracking, typing indicators with debounce. (✅ Completed)
+5. **Phase 5: Group Chat** — Group creation, admin member management, group socket broadcasts. (✅ Completed)
+6. **Phase 6: Polish & UX** — Unread badges, dynamic sorting by recent message, input validation/sanitization, responsive mobile layout. (✅ Completed)
+7. **Phase 6.5: User Profiles & Editorial UI** — ProfileModal, UserProfileModal, Lightbox preview, ImageKit avatars, editorial UI polish. (✅ Completed)
+8. **Phase 7: Deployment** — Render Web Service, Vercel frontend, MongoDB Atlas network whitelist, cross-origin Bearer token auth, live verification. (✅ Completed)
 
 ---
 

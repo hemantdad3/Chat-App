@@ -269,25 +269,29 @@ Empower users to customize their personal identity with a unique username (`@use
 ## Phase 7: Deployment
 
 ### Goal
-Deploy backend web service to Render, frontend application to Vercel, connect production MongoDB Atlas database, and verify cross-origin cookies and live sockets.
+Deploy backend web service to Render, frontend application to Vercel, connect production MongoDB Atlas database, and verify cross-origin cookies, Bearer token authentication, and live WebSockets.
 
 ### Backend Scope (Render)
 - Root directory `/server`.
-- Build command: `npm install`, Start command: `node server.js` (or `npm start`).
-- Environment variables: `PORT`, `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` (pointing to Vercel domain).
-- Configure CORS with `origin: process.env.CLIENT_URL`, `credentials: true`.
-- Cookie options: `sameSite: 'none'`, `secure: true` for production cross-domain cookies.
+- Build command: `npm install`, Start command: `node server.js`.
+- Live Backend URL: `https://chat-app-ygvp.onrender.com`.
+- Environment variables: `PORT=5000`, `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL=https://chat-app-phi-five-zoj1xpxkxv.vercel.app`, `NODE_ENV=production`, `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT`.
+- MongoDB Atlas Network Access: Whitelisted `0.0.0.0/0` (allow from anywhere) to accept Render cloud connections.
+- Health Check route: `GET /api/health` returning 200 OK.
+- CORS & Auth: `credentials: true` allowing Vercel domain; `authMiddleware` accepting both `httpOnly` cookie and `Authorization: Bearer <token>`.
 
 ### Frontend Scope (Vercel)
 - Root directory `/client`.
 - Build command: `npm run build`, Output directory: `dist`.
-- Environment variables: `VITE_API_URL`, `VITE_SOCKET_URL` (pointing to Render service URL).
+- Live Frontend URL: `https://chat-app-phi-five-zoj1xpxkxv.vercel.app/`.
+- Environment variables: `VITE_API_URL=https://chat-app-ygvp.onrender.com/api`, `VITE_SOCKET_URL=https://chat-app-ygvp.onrender.com`.
+- Cross-Domain Auth: Axios request interceptor attaching Bearer token from `localStorage` as a fallback against third-party cookie restrictions.
 
 ### Verification & Testing
-1. Verify live backend health check endpoint on Render.
-2. Sign up and log in on live Vercel URL.
-3. Test cross-domain httpOnly cookie storage.
-4. Test real-time messaging and socket connection across two live devices/browsers.
+1. Verified live backend health check endpoint (`GET https://chat-app-ygvp.onrender.com/api/health`) returns 200 OK with uptime.
+2. Sign up and log in on live Vercel domain.
+3. Verified cross-origin contact discovery: `GET /api/users` successfully retrieves registered contacts via Bearer token authorization.
+4. Tested live bidirectional messaging and socket room broadcast across devices.
 
 ### Suggested Git Commit
 `chore: phase 7 - production deployment configuration and live verification`

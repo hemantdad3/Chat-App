@@ -41,10 +41,15 @@ The application follows a curated Warm & Editorial aesthetic:
 - `MessageInput`: Text input with auto-debounce typing emission and send button.
 - `OnlineStatusDot`: Sage green indicator dot for live presence.
 
-## State Management
-- **AuthContext**: User authentication, session restore via httpOnly cookie, profile update, and avatar upload.
+## State Management & Networking
+- **AuthContext**: User authentication, session restore via httpOnly cookie + `localStorage` Bearer token fallback for cross-domain deployments, profile update, and avatar upload.
+- **Axios (`api.js`)**: Base HTTP client with `withCredentials: true` and an automatic request interceptor attaching `Authorization: Bearer <token>` from `localStorage` as a fallback against third-party cookie blocking.
 - **SocketContext**: Single persistent WebSocket connection, online presence tracking, room joining, and real-time event distribution.
 - **ChatContext**: Active conversation, conversation list sorting by recent activity, paginated messages, optimistic message delivery, and unread counters.
+
+## Production Deployment
+- **Live URL (Vercel)**: `https://chat-app-phi-five-zoj1xpxkxv.vercel.app/`
+- **Backend API (Render)**: `https://chat-app-ygvp.onrender.com`
 
 ## User Profile Customization & Avatar Display
 
