@@ -10,9 +10,6 @@ const { notFound, errorHandler } = require('./src/middleware/errorMiddleware');
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 const server = http.createServer(app);
 
