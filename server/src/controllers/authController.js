@@ -13,8 +13,8 @@ const signup = async (req, res) => {
   try {
     const { name, email, password, username, bio } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide name, email, and password' });
+    if (!name || !email || !password || !username || !username.trim()) {
+      return res.status(400).json({ message: 'Please provide name, username, email, and password' });
     }
 
     if (password.length < 6) {
@@ -27,20 +27,17 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: 'User with this email already exists' });
     }
 
-    // Validate username if provided
-    let cleanUsername = null;
-    if (username && username.trim()) {
-      cleanUsername = username.trim().toLowerCase();
-      if (!/^[a-zA-Z0-9_]{3,30}$/.test(cleanUsername)) {
-        return res.status(400).json({
-          message: 'Username must be between 3 and 30 characters and contain only letters, numbers, and underscores',
-        });
-      }
+    // Validate required username format and uniqueness
+    const cleanUsername = username.trim().toLowerCase();
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(cleanUsername)) {
+      return res.status(400).json({
+        message: 'Username must be between 3 and 30 characters and contain only letters, numbers, and underscores',
+      });
+    }
 
-      const usernameExists = await User.findOne({ username: cleanUsername });
-      if (usernameExists) {
-        return res.status(400).json({ message: 'Username is already taken' });
-      }
+    const usernameExists = await User.findOne({ username: cleanUsername });
+    if (usernameExists) {
+      return res.status(400).json({ message: 'Username is already taken' });
     }
 
     // Validate and sanitize bio if provided

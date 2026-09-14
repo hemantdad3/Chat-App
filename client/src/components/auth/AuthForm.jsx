@@ -75,10 +75,14 @@ const AuthForm = ({ mode }) => {
       return setLocalError('Please enter your full name');
     }
 
-    if (isSignup && formData.username.trim()) {
+    if (isSignup && !formData.username.trim()) {
+      return setLocalError('Please choose a username');
+    }
+
+    if (isSignup) {
       const cleanUsername = formData.username.trim().toLowerCase();
       if (!/^[a-zA-Z0-9_]{3,30}$/.test(cleanUsername)) {
-        return setLocalError('Username must be 3–30 characters and contain only letters, numbers, or underscores');
+        return setLocalError('Username must be between 3 and 30 characters and contain only letters, numbers, and underscores');
       }
     }
 
@@ -231,14 +235,14 @@ const AuthForm = ({ mode }) => {
           </div>
         )}
 
-        {/* Username (Signup only) */}
+        {/* Username (Signup only, required) */}
         {isSignup && (
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-xs font-medium text-ink" htmlFor="username">
-                Username (optional)
+                Username
               </label>
-              <span className="text-[10px] text-ink-muted">Auto-generated if empty</span>
+              <span className="text-[10px] text-ink-muted">3–30 characters, unique</span>
             </div>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-ink-muted select-none">
