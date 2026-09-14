@@ -9,6 +9,14 @@ const authService = {
    * @param {{ name: string, email: string, password: string }} userData
    */
   signup: async (userData) => {
+    if (userData instanceof FormData) {
+      const response = await api.post('/auth/signup', userData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    }
     const response = await api.post('/auth/signup', userData);
     return response.data;
   },

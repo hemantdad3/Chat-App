@@ -26,11 +26,20 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Signup action
-  const signup = async (name, email, password) => {
+  const signup = async (payloadOrName, email, password, username, bio, avatarFile) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await authService.signup({ name, email, password });
+      let payload;
+      if (payloadOrName instanceof FormData) {
+        payload = payloadOrName;
+      } else if (typeof payloadOrName === 'object' && payloadOrName !== null) {
+        payload = payloadOrName;
+      } else {
+        payload = { name: payloadOrName, email, password, username, bio };
+      }
+
+      const data = await authService.signup(payload);
       setUser(data);
       return data;
     } catch (err) {

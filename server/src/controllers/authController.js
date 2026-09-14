@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const generateTokenAndSetCookie = require('../utils/generateToken');
+const { isConfigured, getImageKit } = require('../config/imagekit');
+const { sanitizeInput } = require('../utils/sanitize');
 
 /**
  * @desc    Register a new user
@@ -9,7 +11,7 @@ const generateTokenAndSetCookie = require('../utils/generateToken');
  */
 const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, username, bio } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Please provide name, email, and password' });
@@ -19,22 +21,78 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: 'Password must be at least 6 characters' });
     }
 
-    // Check if user already exists
+    // Check if user already exists with email
     const userExists = await User.findOne({ email: email.toLowerCase().trim() });
     if (userExists) {
       return res.status(400).json({ message: 'User with this email already exists' });
+    }
+
+    // Validate username if provided
+    let cleanUsername = null;
+    if (username && username.trim()) {
+      cleanUsername = username.trim().toLowerCase();
+      if (!/^[a-zA-Z0-9_]{3,30}$/.test(cleanUsername)) {
+        return res.status(400).json({
+          message: 'Username must be between 3 and 30 characters and contain only letters, numbers, and underscores',
+        });
+      }
+
+      const usernameExists = await User.findOne({ username: cleanUsername });
+      if (usernameExists) {
+        return res.status(400).json({ message: 'Username is already taken' });
+      }
+    }
+
+    // Validate and sanitize bio if provided
+    let cleanBio = '';
+    if (bio !== undefined && bio !== null && bio.trim()) {
+      cleanBio = sanitizeInput(bio);
+      if (cleanBio.length > 150) {
+        return res.status(400).json({ message: 'Bio cannot exceed 150 characters' });
+      }
+    }
+
+    // Handle avatar upload if file is attached
+    let avatarUrl = null;
+    if (req.file) {
+      if (isConfigured()) {
+        try {
+          const imagekit = getImageKit();
+          const fileExtension = req.file.mimetype.split('/')[1] || 'jpg';
+          const fileName = `avatar_signup_${Date.now()}.${fileExtension}`;
+
+          const uploadResult = await imagekit.upload({
+            file: req.file.buffer.toString('base64'),
+            fileName,
+            folder: '/chat_avatars',
+          });
+
+          if (uploadResult && uploadResult.url) {
+            avatarUrl = uploadResult.url;
+          }
+        } catch (uploadErr) {
+          console.error('Signup avatar upload warning:', uploadErr.message);
+        }
+      }
     }
 
     // Hash password with bcrypt
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Create user
-    const user = await User.create({
+    // Build user payload
+    const userPayload = {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       passwordHash,
-    });
+    };
+
+    if (cleanUsername) userPayload.username = cleanUsername;
+    if (cleanBio) userPayload.bio = cleanBio;
+    if (avatarUrl) userPayload.avatarUrl = avatarUrl;
+
+    // Create user in database
+    const user = await User.create(userPayload);
 
     if (user) {
       // Issue JWT in httpOnly cookie
