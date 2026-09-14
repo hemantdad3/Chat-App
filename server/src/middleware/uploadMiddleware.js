@@ -3,15 +3,17 @@ const multer = require('multer');
 // Configure in-memory storage for file uploads
 const storage = multer.memoryStorage();
 
-// Allowed MIME types
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+// Allowed MIME types - strictly JPG/JPEG only
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/pjpeg'];
 
 // File filter validation
 const fileFilter = (req, file, cb) => {
-  if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+  const isJpegMime = ALLOWED_MIME_TYPES.includes(file.mimetype);
+  const hasJpgExt = /\.(jpe?g)$/i.test(file.originalname);
+  if (isJpegMime && hasJpgExt) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPG, PNG, and WebP images are allowed.'), false);
+    cb(new Error('Invalid file type. Only JPG/JPEG images under 2MB are allowed.'), false);
   }
 };
 

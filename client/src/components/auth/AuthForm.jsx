@@ -52,9 +52,9 @@ const AuthForm = ({ mode }) => {
     if (localError) setLocalError('');
     if (serverError) clearError();
 
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      return setLocalError('Please select a JPG, PNG, or WebP image file.');
+    const isJpg = file.type === 'image/jpeg' || file.type === 'image/pjpeg' || /\.jpe?g$/i.test(file.name);
+    if (!isJpg) {
+      return setLocalError('Please select a JPG image file.');
     }
 
     if (file.size > 2 * 1024 * 1024) {
@@ -188,12 +188,12 @@ const AuthForm = ({ mode }) => {
               type="file"
               ref={fileInputRef}
               onChange={handleAvatarChange}
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/pjpeg,.jpg,.jpeg"
               className="hidden"
             />
 
             <span className="text-[11px] text-ink-muted mt-2">
-              {avatarFile ? avatarFile.name : 'Upload avatar (optional, under 2MB)'}
+              {avatarFile ? avatarFile.name : 'Upload avatar (optional, JPG only, under 2MB)'}
             </span>
           </div>
         )}

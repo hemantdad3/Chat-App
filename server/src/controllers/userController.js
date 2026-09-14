@@ -140,7 +140,13 @@ const updateProfile = async (req, res) => {
 const uploadAvatar = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'Please provide an image file (JPG, PNG, or WebP up to 2MB)' });
+      return res.status(400).json({ message: 'Please provide an image file (JPG only, under 2MB)' });
+    }
+
+    const isJpegMime = req.file.mimetype === 'image/jpeg' || req.file.mimetype === 'image/pjpeg';
+    const hasJpgExt = /\.(jpe?g)$/i.test(req.file.originalname);
+    if (!isJpegMime || !hasJpgExt) {
+      return res.status(400).json({ message: 'Invalid file type. Only JPG/JPEG images are allowed.' });
     }
 
     if (!isConfigured()) {

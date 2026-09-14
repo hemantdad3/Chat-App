@@ -52,6 +52,12 @@ const signup = async (req, res) => {
     // Handle avatar upload if file is attached
     let avatarUrl = null;
     if (req.file) {
+      const isJpegMime = req.file.mimetype === 'image/jpeg' || req.file.mimetype === 'image/pjpeg';
+      const hasJpgExt = /\.(jpe?g)$/i.test(req.file.originalname);
+      if (!isJpegMime || !hasJpgExt) {
+        return res.status(400).json({ message: 'Invalid file type. Only JPG/JPEG images are allowed.' });
+      }
+
       if (isConfigured()) {
         try {
           const imagekit = getImageKit();
