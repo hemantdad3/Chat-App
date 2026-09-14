@@ -6,8 +6,8 @@
 
 ## Live Demo
 
-- **Frontend (Vercel)**: [https://your-chat-app.vercel.app](https://your-chat-app.vercel.app) *(Coming in Phase 7)*
-- **Backend API (Render)**: [https://your-chat-api.onrender.com](https://your-chat-api.onrender.com) *(Coming in Phase 7)*
+- **Frontend (Vercel)**: (https://chat-app-phi-five-zoj1xpxkxv.vercel.app/)
+- **Backend API (Render)**: https://chat-app-ygvp.onrender.com
 
 ---
 
