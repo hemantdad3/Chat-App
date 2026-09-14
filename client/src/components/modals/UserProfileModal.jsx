@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Avatar from '../common/Avatar';
 import OnlineStatusDot from '../chat/OnlineStatusDot';
-import { X, MessageSquare, Calendar } from 'lucide-react';
+import { X, MessageSquare, Calendar, Eye } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 
 /**
@@ -28,36 +28,51 @@ const formatLastSeen = (dateStr) => {
  */
 const UserProfileModal = ({ isOpen, onClose, targetUser, onStartChat }) => {
   const { isUserOnline } = useSocket();
+  const [showLightbox, setShowLightbox] = useState(false);
 
   if (!isOpen || !targetUser) return null;
 
   const isOnline = isUserOnline(targetUser._id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-xs animate-fadeIn">
-      <div className="w-full max-w-sm bg-sand-light border border-ink-border rounded-2xl p-6 shadow-xl flex flex-col relative">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-ink-muted hover:text-ink rounded-lg hover:bg-sand transition-colors cursor-pointer"
-          title="Close"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-xs animate-fadeIn">
+        <div className="w-full max-w-sm bg-sand-light border border-ink-border rounded-2xl p-6 shadow-xl flex flex-col relative">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 text-ink-muted hover:text-ink rounded-lg hover:bg-sand transition-colors cursor-pointer"
+            title="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-        {/* Profile Card Header */}
-        <div className="flex flex-col items-center text-center mt-2 mb-4">
-          <Avatar
-            src={targetUser.avatarUrl}
-            name={targetUser.name}
-            size="2xl"
-            isOnline={isOnline}
-            className="mb-3 shadow-sm"
-          />
+          {/* Profile Card Header */}
+          <div className="flex flex-col items-center text-center mt-2 mb-4">
+            <div className="relative group mb-3">
+              <Avatar
+                src={targetUser.avatarUrl}
+                name={targetUser.name}
+                size="2xl"
+                isOnline={isOnline}
+                className="shadow-sm cursor-pointer"
+                onClick={() => setShowLightbox(true)}
+              />
 
-          <h3 className="text-base font-bold text-ink tracking-tight font-serif">
-            {targetUser.name}
-          </h3>
+              {/* Small View Avatar badge button */}
+              <button
+                type="button"
+                onClick={() => setShowLightbox(true)}
+                className="absolute -bottom-1 -left-1 p-2 bg-cream hover:bg-sand text-ink rounded-xl shadow-md cursor-pointer transition-colors border border-ink-border"
+                title="View full-size avatar"
+              >
+                <Eye className="w-3.5 h-3.5 text-terracotta" />
+              </button>
+            </div>
+
+            <h3 className="text-base font-bold text-ink tracking-tight font-serif">
+              {targetUser.name}
+            </h3>
 
           <p className="text-xs text-terracotta font-medium mt-0.5">
             @{targetUser.username || 'user'}
@@ -103,6 +118,51 @@ const UserProfileModal = ({ isOpen, onClose, targetUser, onStartChat }) => {
         </div>
       </div>
     </div>
+
+      {/* Full-size Avatar Lightbox Modal */}
+      {showLightbox && (
+        <div
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-ink/75 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setShowLightbox(false)}
+        >
+          <div
+            className="relative bg-sand-light border border-ink-border rounded-2xl p-5 max-w-sm sm:max-w-md w-full shadow-2xl flex flex-col items-center animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Lightbox Header */}
+            <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-ink-border">
+              <div className="flex items-center gap-2 text-xs font-semibold text-ink">
+                <Eye className="w-4 h-4 text-terracotta" />
+                <span>Avatar Preview</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLightbox(false)}
+                className="p-1.5 text-ink-muted hover:text-ink rounded-lg hover:bg-sand transition-colors cursor-pointer"
+                title="Close preview"
+              >
+                <X className="w-4.5 h-4.5" />
+              </button>
+            </div>
+
+            {/* Full Size Image */}
+            <div className="w-full aspect-square max-w-[320px] bg-sand rounded-xl overflow-hidden flex items-center justify-center border border-ink-border/50 shadow-inner">
+              <img
+                src={targetUser.avatarUrl}
+                alt={`${targetUser.name}'s Avatar`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Lightbox Footer */}
+            <div className="w-full flex items-center justify-between pt-3 mt-3 border-t border-ink-border text-xs text-ink-muted">
+              <span className="font-semibold text-ink truncate">{targetUser.name}</span>
+              <span className="text-[11px] font-mono">@{targetUser.username || 'user'}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

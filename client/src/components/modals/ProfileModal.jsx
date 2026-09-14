@@ -208,29 +208,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
-              {/* Action buttons: View Avatar & Change Photo */}
-              <div className="mt-3 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowLightbox(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-sand hover:bg-sand-dark/40 border border-ink-border rounded-lg text-xs font-medium text-ink transition-colors cursor-pointer"
-                  title="View full-size avatar preview"
-                >
-                  <Eye className="w-3.5 h-3.5 text-terracotta" />
-                  <span>View Avatar</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingAvatar || loading}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-sand hover:bg-sand-dark/40 border border-ink-border rounded-lg text-xs font-medium text-ink transition-colors cursor-pointer disabled:cursor-not-allowed"
-                >
-                  <Camera className="w-3.5 h-3.5 text-terracotta" />
-                  <span>Change Photo</span>
-                </button>
-              </div>
-
               {/* Hidden file input strictly JPG */}
               <input
                 type="file"
