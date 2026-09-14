@@ -16,7 +16,7 @@ import {
 
 /**
  * Reusable AuthForm component for Login and Signup
- * Supports Full Name, Username, Avatar upload, Bio, Email, and Password
+ * Supports Full Name, Username, Avatar upload, Email, and Password
  * @param {{ mode: 'login' | 'signup' }} props
  */
 const AuthForm = ({ mode }) => {
@@ -28,7 +28,6 @@ const AuthForm = ({ mode }) => {
     name: '',
     username: '',
     email: '',
-    bio: '',
     password: '',
     confirmPassword: '',
   });
@@ -90,10 +89,6 @@ const AuthForm = ({ mode }) => {
       return setLocalError('Please enter your email address');
     }
 
-    if (isSignup && formData.bio.length > 150) {
-      return setLocalError('Bio cannot exceed 150 characters');
-    }
-
     if (!formData.password) {
       return setLocalError('Please enter your password');
     }
@@ -114,12 +109,7 @@ const AuthForm = ({ mode }) => {
           formPayload.append('name', formData.name.trim());
           formPayload.append('email', formData.email.trim());
           formPayload.append('password', formData.password);
-          if (formData.username.trim()) {
-            formPayload.append('username', formData.username.trim().toLowerCase());
-          }
-          if (formData.bio.trim()) {
-            formPayload.append('bio', formData.bio.trim());
-          }
+          formPayload.append('username', formData.username.trim().toLowerCase());
           formPayload.append('avatar', avatarFile);
           await signup(formPayload);
         } else {
@@ -127,13 +117,8 @@ const AuthForm = ({ mode }) => {
             name: formData.name.trim(),
             email: formData.email.trim(),
             password: formData.password,
+            username: formData.username.trim().toLowerCase(),
           };
-          if (formData.username.trim()) {
-            jsonPayload.username = formData.username.trim().toLowerCase();
-          }
-          if (formData.bio.trim()) {
-            jsonPayload.bio = formData.bio.trim();
-          }
           await signup(jsonPayload);
         }
       } else {
@@ -284,34 +269,6 @@ const AuthForm = ({ mode }) => {
             />
           </div>
         </div>
-
-        {/* Bio (Signup only) */}
-        {isSignup && (
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-medium text-ink" htmlFor="bio">
-                Bio (optional)
-              </label>
-              <span
-                className={`text-[10px] ${
-                  formData.bio.length > 140 ? 'text-terracotta font-semibold' : 'text-ink-muted'
-                }`}
-              >
-                {formData.bio.length}/150
-              </span>
-            </div>
-            <textarea
-              id="bio"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              placeholder="Short bio about yourself..."
-              maxLength={150}
-              rows={2}
-              className="w-full bg-cream border border-ink-border text-ink text-xs rounded-xl px-3.5 py-2 placeholder-ink-faint focus:outline-none focus:border-terracotta focus:ring-1 focus:ring-terracotta transition-colors resize-none"
-            />
-          </div>
-        )}
 
         {/* Password */}
         <div>
