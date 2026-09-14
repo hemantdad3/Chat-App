@@ -8,14 +8,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check existing session on mount using httpOnly cookie
+  // Check existing session on mount using httpOnly cookie or stored token
   useEffect(() => {
     const checkLoggedInUser = async () => {
       try {
         const currentUser = await authService.getMe();
-        setUser(currentUser);
+        const storedToken = localStorage.getItem('token');
+        setUser({ ...currentUser, token: currentUser.token || storedToken });
       } catch (err) {
         // User not logged in or token expired - silent catch
+        localStorage.removeItem('token');
         setUser(null);
       } finally {
         setLoading(false);
@@ -40,6 +42,9 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await authService.signup(payload);
+      if (data?.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data);
       return data;
     } catch (err) {
@@ -57,6 +62,9 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const data = await authService.login({ email, password });
+      if (data?.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data);
       return data;
     } catch (err) {
@@ -75,6 +83,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err.message);
     } finally {
+      localStorage.removeItem('token');
       setUser(null);
       setError(null);
     }
