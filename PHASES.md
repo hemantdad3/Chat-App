@@ -15,7 +15,7 @@ This document outlines the step-by-step implementation plan for the **MERN Real-
 | **Phase 5** | Group Chat | Group creation, member add/remove, admin checks, group message broadcast | NewGroupModal, Group member list management UI, sender names on messages | ✅ Completed |
 | **Phase 6** | Polish & UX | Input sanitization, validation, recent conversation sorting, unread counters | Unread badge/counter, auto-scroll chat window, responsive layout (mobile) | ✅ Completed |
 | **Phase 6.5** | User Profiles & Editorial UI | Username/bio models, ImageKit cloud avatars (JPG only <2MB), PATCH /api/users/me | ProfileModal, UserProfileModal popover, Lightbox preview, editorial UI refinements | ✅ Completed |
-| **Phase 7** | Deployment | Render Web Service config, CORS credentials, production env configuration | Vercel frontend config, environment variables, end-to-end live testing | ⏳ Pending |
+| **Phase 7** | Deployment | Render Web Service config, CORS credentials, production env configuration | Vercel frontend config, environment variables, end-to-end live testing | ✅ Completed |
 
 ---
 
